@@ -19,10 +19,13 @@
 
 | Info       | Description |
 | ---------- | ----------- |
-| Title      | TBD         |
+| Title      | SuiteMate   |
 | System URL | TBD         |
 | Video Link | TBD         |
 
 ## Project Summary
 
-This is a summary of the project!
+It's a web application enabling users to discover their ideal roommates and explore and lease properties listed by various leasing companies or their agents. It serves as a comprehensive hub catering to both individuals seeking roommates and multiple apartment owners.
+
+
+This web application will be a one-stop solution for people looking for accommodation, offering the added benefit of making connections and forming friendships along the way.
