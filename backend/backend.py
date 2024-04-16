@@ -22,7 +22,7 @@ def connect_to_database():
         print("Error: ", err)
         return None
 
-# connection = connect_to_database()
+connection = connect_to_database()
 
 def run_query(query):
     if connection:
