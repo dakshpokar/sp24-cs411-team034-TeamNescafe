@@ -4,3 +4,4 @@ venv
 backend/__pycache__
 backend/configs/config.json
 .DS_Store
+.vscode
