@@ -35,7 +35,7 @@ def run_query(query):
         
 def authenticate_user(username, password):
     try:
-        query = "SELECT password FROM users WHERE username = %s"
+        query = f"SELECT password FROM users WHERE username = {username}"
         result = run_query(query)
         if result:
             db_password = result[0]
