@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 import mysql.connector
 from flask_cors import CORS
 import hashlib
-from utils import load_backend_config, run_query
+from utils import *
 
 configuration = load_backend_config()
 DB_CONFIG = configuration['DB_CONFIG']
@@ -23,12 +23,12 @@ def connect_to_database():
 
 connection = connect_to_database()
         
-def authenticate_user(username, password):
+def authenticate_user(email, password):
     try:
-        query = f"SELECT password FROM users WHERE username = {username}"
+        query = f"SELECT password_hash FROM user WHERE email_id = '{email}';"
         result = run_query(connection, query)
         if result:
-            db_password = result[0]
+            db_password = result[0][0]
             if len(db_password) == 32:
                 hashed_password = hashlib.md5(password.encode()).hexdigest()
                 return hashed_password == db_password
@@ -50,26 +50,39 @@ def sanitize_input(data):
 def login():
     try:
         data = request.json
-        username = sanitize_input(data.get('username'))
+        email = sanitize_input(data.get('email'))
         password = sanitize_input(data.get('password'))
 
-        if not username or not password:
+        if not email or not password:
             return jsonify({'error': 'Username and password are required'}), 400
 
-        if authenticate_user(username, password):
-            return jsonify({'success': True, 'message': 'Login successful'})
+        if authenticate_user(email, password):
+            query = f"SELECT user_id, email_id, role_type, first_name, last_name, phone_number, gender, date_of_birth FROM user WHERE email_id = '{email}';"
+            row = run_query(connection, query)[0]
+            results = {'user_id': row[0],
+                        'email_id': row[1],
+                        'role_type': row[2],
+                        'first_name': row[3],
+                        'last_name': row[4],
+                        'phone_number': row[5],
+                        'gender': row[6],
+                        'date_of_birth': row[7]
+                    }
+            token = generate_token()
+            insert_token(connection, row[0], token)
+            return jsonify({'success': True, 'message': 'Login successful', 'token':token, 'user':results})
         else:
             return jsonify({'success': False, 'error': 'Invalid username or password'}), 401
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
 
-@app.route('/api/property_ratings_by_area', methods=['POST'])
+@app.route('/api/property_ratings_by_area', methods=['GET'])
 def property_ratings_by_area():
     try:
-        data = request.json
-        min_area = sanitize_input(data.get('min_area'))
-        max_area = sanitize_input(data.get('max_area'))
+        query_params = request.args
+        min_area = query_params['min_area']
+        max_area = query_params['max_area']
 
         query = (f"SELECT review.property_id, "
                 f"prop.name, "
@@ -99,16 +112,15 @@ def property_ratings_by_area():
             })
 
         return jsonify(results)
-
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/popular_properties', methods=['POST'])
+@app.route('/api/popular_properties', methods=['GET'])
 def popular_properties():
     try:
-        data = request.json
-        bathrooms = sanitize_input(data.get('bathrooms'))
-        bedrooms = sanitize_input(data.get('bedrooms'))
+        query_params = request.args
+        bathrooms = query_params['bathrooms']
+        bedrooms = query_params['bedrooms']
 
         query = (f"SELECT q1.property_id, q1.num_applications / q2.num_units AS popularity_ratio "
                 f"FROM (SELECT p.property_id, COUNT(a.unit_id) AS num_applications "
@@ -191,6 +203,34 @@ def min_max_rent():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
+@app.route('/api/get_unit_app_count', methods=['GET'])
+def get_unit_app_count():
+    try:
+        if not check_agent_role(user_id):
+            return jsonify({'error': "User is not an Agent"}), 403
+        query_params = request.args
+        company_id = query_params['company_id']
+        
+        query = (f"SELECT u.apartment_no, "
+                f"p.name, "
+                f"COUNT(*) "
+                f"FROM unit u "
+                f"JOIN property p ON p.property_id = u.property_id "
+                f"JOIN applications app ON app.unit_id = u.unit_id "
+                f"WHERE p.company_id = {company_id} "
+                f"GROUP BY u.unit_id;")
+        rows = run_query(connection, query)
+
+        results = []
+        for row in rows:
+            results.append({
+                    'apartment_num': row[0],
+                    'property_name': row[1],
+                    'num_applications': row[2]
+                })
+        return jsonify(results)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=(ENV == 'dev'), port=PORT)
