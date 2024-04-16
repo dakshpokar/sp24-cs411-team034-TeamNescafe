@@ -21,28 +21,32 @@ def connect_to_database():
         print("Error: ", err)
         return None
 
+connection = connect_to_database()
 
+def run_query(query):
+    if connection:
+        cursor = connection.cursor()
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        cursor.close()
+        return rows
+    else:
+        return False
+        
 def authenticate_user(username, password):
     try:
-        connection = connect_to_database()
-        if connection:
-            cursor = connection.cursor()
-            query = "SELECT password FROM users WHERE username = %s"
-            cursor.execute(query, (username,))
-            result = cursor.fetchone()
-            cursor.close()
-            connection.close()
-            if result:
-                db_password = result[0]
-                if len(db_password) == 32:
-                    hashed_password = hashlib.md5(password.encode()).hexdigest()
-                    return hashed_password == db_password
-                else:
-                    return password == db_password
+        query = "SELECT password FROM users WHERE username = %s"
+        result = run_query(query)
+        if result:
+            db_password = result[0]
+            if len(db_password) == 32:
+                hashed_password = hashlib.md5(password.encode()).hexdigest()
+                return hashed_password == db_password
             else:
-                return False
+                return password == db_password
         else:
             return False
+
     except Exception as e:
         print("Error:", e)
         return False
@@ -67,201 +71,136 @@ def login():
         else:
             return jsonify({'success': False, 'error': 'Invalid username or password'}), 401
     except Exception as e:
-
         return jsonify({'error': str(e)}), 500
     
 
 @app.route('/api/property_ratings_by_area', methods=['POST'])
 def property_ratings_by_area():
     try:
-        connection = connect_to_database()
         data = request.json
         min_area = sanitize_input(data.get('min_area'))
         max_area = sanitize_input(data.get('max_area'))
 
-        if connection:
-            cursor = connection.cursor()
-            query = (f"SELECT review.property_id, "
-                    f"prop.name, "
-                    f"prop.pincode, "
-                    f"AVG(review.rating) AS avg_rating, "
-                    f"COUNT(review.rating) AS num_reviews "
-                    f"FROM reviews review "
-                    f"JOIN property prop ON prop.property_id = review.property_id "
-                    f"WHERE review.property_id IN ( "
-                    f"SELECT DISTINCT p.property_id "
-                    f"FROM property p "
-                    f"JOIN unit u ON p.property_id = u.property_id "
-                    f"WHERE u.availability = 1 AND u.area >= {min_area} AND u.area <= {max_area} "
-                    f") "
-                    f"GROUP BY review.property_id "
-                    f"HAVING num_reviews >= 2;")
-            cursor.execute(query)
-            rows = cursor.fetchall()
+        query = (f"SELECT review.property_id, "
+                f"prop.name, "
+                f"prop.pincode, "
+                f"AVG(review.rating) AS avg_rating, "
+                f"COUNT(review.rating) AS num_reviews "
+                f"FROM reviews review "
+                f"JOIN property prop ON prop.property_id = review.property_id "
+                f"WHERE review.property_id IN ( "
+                f"SELECT DISTINCT p.property_id "
+                f"FROM property p "
+                f"JOIN unit u ON p.property_id = u.property_id "
+                f"WHERE u.availability = 1 AND u.area >= {min_area} AND u.area <= {max_area} "
+                f") "
+                f"GROUP BY review.property_id "
+                f"HAVING num_reviews >= 2;")
+        rows = run_query(query)
 
-            cursor.close()
-            connection.close()
+        results = []
+        for row in rows:
+            results.append({
+                'property_id': row[0],
+                'name': row[1],
+                'pincode': row[2],
+                'avg_rating': row[3],
+                'num_reviews': row[4]
+            })
 
-            results = []
-            for row in rows:
-                results.append({
-                    'property_id': row[0],
-                    'name': row[1],
-                    'pincode': row[2],
-                    'avg_rating': row[3],
-                    'num_reviews': row[4]
-                })
+        return jsonify(results)
 
-            return jsonify(results)
-        else:
-            return jsonify({'error': 'Failed to connect to the database'}), 500
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/popular_properties', methods=['POST'])
 def popular_properties():
     try:
-        connection = connect_to_database()
         data = request.json
         bathrooms = sanitize_input(data.get('bathrooms'))
         bedrooms = sanitize_input(data.get('bedrooms'))
 
-        if connection:
-            cursor = connection.cursor()
-            query = (f"SELECT q1.property_id, q1.num_applications / q2.num_units AS popularity_ratio "
-                    f"FROM (SELECT p.property_id, COUNT(a.unit_id) AS num_applications "
-                    f"FROM property p "
-                    f"LEFT JOIN unit u ON p.property_id = u.property_id "
-                    f"LEFT JOIN applications a ON u.unit_id = a.unit_id "
-                    f"WHERE p.property_id IN (SELECT DISTINCT property.property_id "
-                    f"FROM property "
-                    f"JOIN unit ON property.property_id = unit.property_id "
-                    f"WHERE unit.availability = TRUE AND unit.bedrooms > {bedrooms} AND unit.bathrooms > {bathrooms}) "
-                    f"GROUP BY p.property_id) AS q1 "
-                    f"INNER JOIN "
-                    f"(SELECT p.property_id, COUNT(u.unit_id) AS num_units "
-                    f"FROM property p "
-                    f"LEFT JOIN unit u ON p.property_id = u.property_id "
-                    f"WHERE p.property_id IN (SELECT DISTINCT property.property_id "
-                    f"FROM property "
-                    f"JOIN unit ON property.property_id = unit.property_id "
-                    f"WHERE unit.availability = TRUE AND unit.bedrooms > {bedrooms} AND unit.bathrooms > {bathrooms}) "
-                    f"GROUP BY p.property_id) AS q2 "
-                    f"ON q1.property_id = q2.property_id "
-                    f"HAVING popularity_ratio > 0; ")
-            cursor.execute(query)
-            rows = cursor.fetchall()
+        query = (f"SELECT q1.property_id, q1.num_applications / q2.num_units AS popularity_ratio "
+                f"FROM (SELECT p.property_id, COUNT(a.unit_id) AS num_applications "
+                f"FROM property p "
+                f"LEFT JOIN unit u ON p.property_id = u.property_id "
+                f"LEFT JOIN applications a ON u.unit_id = a.unit_id "
+                f"WHERE p.property_id IN (SELECT DISTINCT property.property_id "
+                f"FROM property "
+                f"JOIN unit ON property.property_id = unit.property_id "
+                f"WHERE unit.availability = TRUE AND unit.bedrooms > {bedrooms} AND unit.bathrooms > {bathrooms}) "
+                f"GROUP BY p.property_id) AS q1 "
+                f"INNER JOIN "
+                f"(SELECT p.property_id, COUNT(u.unit_id) AS num_units "
+                f"FROM property p "
+                f"LEFT JOIN unit u ON p.property_id = u.property_id "
+                f"WHERE p.property_id IN (SELECT DISTINCT property.property_id "
+                f"FROM property "
+                f"JOIN unit ON property.property_id = unit.property_id "
+                f"WHERE unit.availability = TRUE AND unit.bedrooms > {bedrooms} AND unit.bathrooms > {bathrooms}) "
+                f"GROUP BY p.property_id) AS q2 "
+                f"ON q1.property_id = q2.property_id "
+                f"HAVING popularity_ratio > 0; ")
+        rows = run_query(query)
 
-            cursor.close()
-            connection.close()
-
-            results = []
-            for row in rows:
-                results.append({
-                    'property_id': row[0],
-                    'popularity_ratio': row[1]
-                })
-
-            return jsonify(results)
-        else:
-            return jsonify({'error': 'Failed to connect to the database'}), 500
+        results = []
+        for row in rows:
+            results.append({
+                'property_id': row[0],
+                'popularity_ratio': row[1]
+            })
+        return jsonify(results)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
 @app.route('/api/apps_per_user', methods=['GET'])
 def apps_per_user():
     try:
-        connection = connect_to_database()
+        query = "SELECT email_id,phone_number, count(*) AS Application_Count FROM user u NATURAL JOIN userdetails ud GROUP BY phone_number,email_id;"
+        rows = run_query(query)
 
-        if connection:
-            cursor = connection.cursor()
-            cursor.execute("SELECT email_id,phone_number, count(*) AS Application_Count FROM user u NATURAL JOIN userdetails ud GROUP BY phone_number,email_id;")
-            rows = cursor.fetchall()
+        results = []
+        for row in rows:
+            results.append({
+                'email_id': row[0],
+                'phone_number': row[1],
+                'Application_Count': row[2]
+            })
+        return jsonify(results)
 
-            cursor.close()
-            connection.close()
-
-            results = []
-            for row in rows:
-                results.append({
-                    'email_id': row[0],
-                    'phone_number': row[1],
-                    'Application_Count': row[2]
-                })
-
-            return jsonify(results)
-        else:
-            return jsonify({'error': 'Failed to connect to the database'}), 500
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/min_max_rent', methods=['GET'])
 def min_max_rent():
     try:
-        connection = connect_to_database()
+        query = (f"SELECT p.pincode, "
+                f"MIN(u.price) AS Min_Rent, "
+                f"MAX(u.price) AS Max_Rent, "
+                f"ROUND(AVG(u.price)) AS Avg_Rent, "
+                f"MIN(u.area) AS Min_Area, "
+                f"MAX(u.area) AS Max_Area, "
+                f"ROUND(AVG(u.area)) AS Avg_Area "
+                f"FROM property p "
+                f"NATURAL JOIN unit u "
+                f"GROUP BY p.pincode;")
+        rows = run_query(query)
 
-        if connection:
-            cursor = connection.cursor()
-            query = (f"SELECT p.pincode, "
-                    f"MIN(u.price) AS Min_Rent, "
-                    f"MAX(u.price) AS Max_Rent, "
-                    f"ROUND(AVG(u.price)) AS Avg_Rent, "
-                    f"MIN(u.area) AS Min_Area, "
-                    f"MAX(u.area) AS Max_Area, "
-                    f"ROUND(AVG(u.area)) AS Avg_Area "
-                    f"FROM property p "
-                    f"NATURAL JOIN unit u "
-                    f"GROUP BY p.pincode;")
-            cursor.execute(query)
-            rows = cursor.fetchall()
-
-            cursor.close()
-            connection.close()
-
-            results = []
-            for row in rows:
-                results.append({
-                        'pincode': row[0],
-                        'min_rent': row[1],
-                        'max_rent': row[2],
-                        'avg_rent': row[3],
-                        'min_area': row[4],
-                        'max_area': row[5],
-                        'avg_area': row[6]
-                    })
-
-            return jsonify(results)
-        else:
-            return jsonify({'error': 'Failed to connect to the database'}), 500
+        results = []
+        for row in rows:
+            results.append({
+                    'pincode': row[0],
+                    'min_rent': row[1],
+                    'max_rent': row[2],
+                    'avg_rent': row[3],
+                    'min_area': row[4],
+                    'max_area': row[5],
+                    'avg_area': row[6]
+                })
+        return jsonify(results)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
-
-@app.route('/api/read_gcp_sql_data', methods=['GET'])
-def read_gcp_sql_data():
-    try:
-        connection = connect_to_database()
-
-        if connection:
-            cursor = connection.cursor()
-            cursor.execute("SELECT * FROM company")
-            rows = cursor.fetchall()
-
-            cursor.close()
-            connection.close()
-
-            results = []
-            for row in rows:
-                results.append({
-                    'name': row[1],
-                    'phone_number': row[2]
-                })
-
-            return jsonify(results)
-        else:
-            return jsonify({'error': 'Failed to connect to the database'}), 500
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
