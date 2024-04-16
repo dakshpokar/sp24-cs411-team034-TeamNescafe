@@ -1,1 +1,4 @@
 frontend/suitemate/package-lock.json
+.venv
+backend/__pycache__
+backend/configs/config.json

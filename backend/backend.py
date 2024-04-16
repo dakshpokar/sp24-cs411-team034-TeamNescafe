@@ -2,16 +2,17 @@ from flask import Flask, jsonify, request
 import mysql.connector
 from flask_cors import CORS
 import hashlib
+from utils import load_backend_config
 
-app = Flask(__name__)
+
+configuration = load_backend_config()
+DB_CONFIG = configuration['DB_CONFIG']
+PORT = configuration['PORT']
+ENV = configuration['ENV']
+VERSION = configuration['VERSION']
+
+app = Flask(f"SuiteMate Server v{VERSION}")
 CORS(app)
-
-DB_CONFIG = {
-    'host': '34.134.253.158',
-    'user': 'root',
-    'password': 'team034',
-    'database': 'dbpt1'
-    }
 
 def connect_to_database():
     try:
@@ -203,4 +204,4 @@ def min_max_rent():
     
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=(ENV == 'dev'), port=PORT)
