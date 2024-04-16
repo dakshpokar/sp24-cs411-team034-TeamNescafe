@@ -1,11 +1,11 @@
 {
-    "VERSION": "1.0.0",
-    "ENV": "dev",
-    "PORT": 3000,
-    "DB_CONFIG": {
-        "host": "<<ip>>",
-        "user": "<<user>>",
-        "password": "<<password>",
-        "database": "<<database>>"
-    }
+	"VERSION": "1.0.0",
+	"ENV": "dev",
+	"PORT": 3000,
+	"DB_CONFIG": {
+		"host": "<<ip>>",
+		"user": "<<user>>",
+		"password": "<<password>",
+		"database": "<<database>>"
+	}
 }
