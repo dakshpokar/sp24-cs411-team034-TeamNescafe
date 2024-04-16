@@ -2,8 +2,7 @@ from flask import Flask, jsonify, request
 import mysql.connector
 from flask_cors import CORS
 import hashlib
-from utils import load_backend_config
-
+from utils import load_backend_config, run_query
 
 configuration = load_backend_config()
 DB_CONFIG = configuration['DB_CONFIG']
@@ -23,21 +22,11 @@ def connect_to_database():
         return None
 
 connection = connect_to_database()
-
-def run_query(query):
-    if connection:
-        cursor = connection.cursor()
-        cursor.execute(query)
-        rows = cursor.fetchall()
-        cursor.close()
-        return rows
-    else:
-        return False
         
 def authenticate_user(username, password):
     try:
         query = f"SELECT password FROM users WHERE username = {username}"
-        result = run_query(query)
+        result = run_query(connection, query)
         if result:
             db_password = result[0]
             if len(db_password) == 32:
@@ -97,7 +86,7 @@ def property_ratings_by_area():
                 f") "
                 f"GROUP BY review.property_id "
                 f"HAVING num_reviews >= 2;")
-        rows = run_query(query)
+        rows = run_query(connection, query)
 
         results = []
         for row in rows:
@@ -142,7 +131,7 @@ def popular_properties():
                 f"GROUP BY p.property_id) AS q2 "
                 f"ON q1.property_id = q2.property_id "
                 f"HAVING popularity_ratio > 0; ")
-        rows = run_query(query)
+        rows = run_query(connection, query)
 
         results = []
         for row in rows:
@@ -158,7 +147,7 @@ def popular_properties():
 def apps_per_user():
     try:
         query = "SELECT email_id,phone_number, count(*) AS Application_Count FROM user u NATURAL JOIN userdetails ud GROUP BY phone_number,email_id;"
-        rows = run_query(query)
+        rows = run_query(connection, query)
 
         results = []
         for row in rows:
@@ -185,7 +174,7 @@ def min_max_rent():
                 f"FROM property p "
                 f"NATURAL JOIN unit u "
                 f"GROUP BY p.pincode;")
-        rows = run_query(query)
+        rows = run_query(connection, query)
 
         results = []
         for row in rows:
