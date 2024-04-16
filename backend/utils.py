@@ -1,5 +1,7 @@
 import json
 import os
+import secrets
+import string
 
 def load_backend_config():
     try:
@@ -8,3 +10,44 @@ def load_backend_config():
     except Exception as e:
         print("Error Loading Configuration File:", e)
         return None
+
+def run_query(connection, query):
+    if connection:
+        cursor = connection.cursor()
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        cursor.close()
+        return rows
+    else:
+        return False
+    
+def run_update_query(connection, query):
+    if connection:
+        cursor = connection.cursor()
+        try:
+            cursor.execute(query)
+            connection.commit()
+            cursor.close()
+            return True
+        except Exception as e:
+            connection.rollback()
+            print(e)
+            return False
+
+def get_user_id(connection, token):
+    query = f"select user_id from tokens where token={token}"
+    rows = run_query(connection, query)
+    if rows:
+        return rows[0]
+    else:
+        return None
+
+def generate_token(length=16):
+    alphabet = string.ascii_letters + string.digits
+    token = ''.join(secrets.choice(alphabet) for _ in range(length))
+    return token
+
+def insert_token(connection, user_id, token):
+    query = f"insert into tokens(token, user_id) values('{token}', {user_id});"
+    run_update_query(connection, query)
+    print("Token Submitted")
