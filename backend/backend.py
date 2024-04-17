@@ -138,7 +138,8 @@ def sign_up():
         if verify_unique_email(connection, email_id):
             query = (f"insert into user (email_id, password_hash, role_type, first_name, last_name, phone_number, gender, date_of_birth) "
                     f"VALUES ('{email_id}', '{password_hash}', '{role_type}', '{first_name}', '{last_name}', '{phone_number}', '{gender}', '{dob}');")
-            run_update_query(connection, query)
+            if not run_update_query(connection, query):
+                return jsonify({'success': False, 'message': "Failed to sign up"}), 409
         else:
             return jsonify({'success': False, 'message': "Email Id is already in use!"}), 409
 
