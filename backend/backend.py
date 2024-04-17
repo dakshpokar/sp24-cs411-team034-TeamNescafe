@@ -142,10 +142,7 @@ def sign_up():
         else:
             return jsonify({'success': False, 'message': "Email Id is already in use!"}), 409
 
-        results = []
-        results.append({
-            'success': True, 'message':'Sign Up Successful'
-        })
+        results = {'success': True, 'message':'Sign Up Successful'}
         return jsonify(results)
 
     except Exception as e:
