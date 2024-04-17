@@ -336,7 +336,6 @@ def get_units_for_agent():
         rows = run_query(connection, query)
 
         results = []
-        print(rows[0])
         for row in rows:
             results.append({
                     'unit_id': row[0],
