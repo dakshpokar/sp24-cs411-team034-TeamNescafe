@@ -41,11 +41,6 @@ def authenticate_user(email, password):
         print("Error:", e)
         return False
 
-def sanitize_input(data):
-    if data:
-        return data.strip()
-    return None
-
 @app.route('/api/login', methods=['POST'])
 def login():
     try:

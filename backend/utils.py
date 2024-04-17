@@ -131,3 +131,17 @@ def insert_token(connection, user_id, token):
     query = f"insert into tokens(token, user_id) values('{token}', {user_id});"
     run_update_query(connection, query)
     print("Token Submitted")
+
+
+def sanitize_input(data):
+    """This function sanitizes the input
+
+    Args:
+        data (str): input data
+    
+    Returns:
+        str: sanitized input
+    """
+    if data:
+        return data.strip()
+    return None
