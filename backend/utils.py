@@ -1,5 +1,4 @@
 import json
-import os
 import secrets
 import string
 
@@ -10,6 +9,15 @@ def load_backend_config():
     except Exception as e:
         print("Error Loading Configuration File:", e)
         return None
+    
+def check_agent_role(connection, user_id):
+        query = f"SELECT role_type from user where user_id = {user_id};"
+        rows = run_query(connection, query)
+        print(rows[0])
+        if rows[0][0]=="Agent":
+            return True
+        else:
+            return False
 
 def run_query(connection, query):
     if connection:
