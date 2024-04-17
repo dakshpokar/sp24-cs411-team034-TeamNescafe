@@ -128,6 +128,35 @@ def update_application():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/sign_up', methods=['POST'])
+def sign_up():
+    try:
+        data = request.json
+        email_id = data['email_id']
+        password_hash = hashlib.md5(data['password'].encode()).hexdigest()
+        role_type = 'Customer'
+        first_name = data['first_name']
+        last_name = data['last_name']
+        phone_number = data['phone_number']
+        gender = data['gender']
+        dob = data['date_of_birth']
+
+        #checking if email is not present already
+        if verify_unique_email(connection, email_id):
+            query = (f"insert into user (email_id, password_hash, role_type, first_name, last_name, phone_number, gender, date_of_birth) "
+                    f"VALUES ('{email_id}', '{password_hash}', '{role_type}', '{first_name}', '{last_name}', '{phone_number}', '{gender}', '{dob}');")
+            if not run_update_query(connection, query):
+                return jsonify({'success': False, 'message': "Failed to sign up"}), 409
+        else:
+            return jsonify({'success': False, 'message': "Email Id is already in use!"}), 409
+
+        results = {'success': True, 'message':'Sign Up Successful'}
+        return jsonify(results)
+
+    except Exception as e:
+        print(e)
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/property_ratings_by_area', methods=['GET'])
 def property_ratings_by_area():
     try:
@@ -379,6 +408,29 @@ def submit_application():
         return jsonify(result)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+@app.route('/api/list_properties', methods=['GET'])
+def list_properties():
+    try:
+        query = ("select p.property_id, p.name, c.name, p.address, p.pincode from property p JOIN company c ON p.company_id = c.company_id;")
+        rows = run_query(connection, query)
+
+        query2 = ("select * from propertyphoto;")
+        rows2 = run_query(connection, query2)
+
+        results = []
+        for row in rows:
+            results.append({
+                    'property_id': row[0],
+                    'property_name': row[1],
+                    'company_name': row[2],
+                    'address': row[3],
+                    'pincode': row[4],
+                    'photos':[row2[1] for row2 in rows2 if row2[0]==row[0]]
+                })
+        return jsonify(results)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
 
 if __name__ == '__main__':
     app.run(debug=(ENV == 'dev'), port=PORT)

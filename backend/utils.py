@@ -46,6 +46,11 @@ def check_agent_role(connection, user_id):
     else:
         return False
 
+def sanitize_input(data):
+    if data:
+        return data.strip()
+    return None
+
 def run_query(connection, query):
     """This function runs a read type query on the database
 
@@ -132,6 +137,12 @@ def insert_token(connection, user_id, token):
     run_update_query(connection, query)
     print("Token Submitted")
 
+def verify_unique_email(connection, email_id):
+    query = f"SELECT * from user where email_id = '{email_id}';"
+    rows = run_query(connection, query)
+    if rows:
+        return False
+    return True
 
 def sanitize_input(data):
     """This function sanitizes the input
