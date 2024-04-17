@@ -41,11 +41,6 @@ def authenticate_user(email, password):
         print("Error:", e)
         return False
 
-def sanitize_input(data):
-    if data:
-        return data.strip()
-    return None
-
 @app.route('/api/login', methods=['POST'])
 def login():
     try:
@@ -120,6 +115,36 @@ def update_application():
         results = []
         results.append({
             'success': success
+        })
+        return jsonify(results)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/sign_up', methods=['POST'])
+def sign_up():
+    try:
+        data = request.form
+        email_id = data['email_id']
+        password_hash = hashlib.md5(data['password'].encode()).hexdigest()
+        role_type = 'Customer'
+        first_name = data['first_name']
+        last_name = data['last_name']
+        phone_number = data['phone_number']
+        gender = data['gender']
+        dob = data['date_of_birth']
+
+        #checking if email is not present already
+        if verify_unique_email(connection, email_id):
+            query = (f"insert into user (email_id, password_hash, role_type, first_name, last_name, phone_number, gender, date_of_birth) "
+                    f"VALUES ('{email_id}', '{password_hash}', '{role_type}', '{first_name}', '{last_name}', '{phone_number}', '{gender}', '{dob}');")
+            run_update_query(connection, query)
+        else:
+            return jsonify({'success': False, 'message': "Email Id is already in use!"})
+
+        results = []
+        results.append({
+            'success': True, 'message':'Sign Up Successful'
         })
         return jsonify(results)
 

@@ -19,6 +19,11 @@ def check_agent_role(connection, user_id):
         else:
             return False
 
+def sanitize_input(data):
+    if data:
+        return data.strip()
+    return None
+
 def run_query(connection, query):
     if connection:
         cursor = connection.cursor()
@@ -59,3 +64,10 @@ def insert_token(connection, user_id, token):
     query = f"insert into tokens(token, user_id) values('{token}', {user_id});"
     run_update_query(connection, query)
     print("Token Submitted")
+
+def verify_unique_email(connection, email_id):
+    query = f"SELECT * from user where email_id = '{email_id}';"
+    rows = run_query(connection, query)
+    if rows:
+        return False
+    return True
