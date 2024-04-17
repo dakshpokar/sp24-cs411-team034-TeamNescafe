@@ -321,6 +321,7 @@ def list_properties():
         results = []
         for row in rows:
             results.append({
+                    'property_id': row[0],
                     'property_name': row[1],
                     'company_name': row[2],
                     'address': row[3],
