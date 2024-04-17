@@ -42,11 +42,6 @@ def authenticate_user(email, password):
         print("Error:", e)
         return False
 
-def sanitize_input(data):
-    if data:
-        return data.strip()
-    return None
-
 @app.route('/api/login', methods=['POST'])
 def login():
     try:
@@ -291,6 +286,76 @@ def get_unit_app_count():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
+
+@app.route('/api/get_units_for_agent', methods=['GET'])
+def get_units_for_agent():
+    """This API is used to get the units that are to be managed by an agent.
+    
+    Args:
+        No Arguments
+    
+    Returns:
+        JSON: A JSON object containing the details of the units that are to be managed by the agent.
+        {
+            "data": [
+                {
+                    "apartment_no": 100,
+                    "area": 418,
+                    "availability": 1,
+                    "bathrooms": 0.5,
+                    "bedrooms": 1,
+                    "company_id": 36,
+                    "pincode": 61854,
+                    "price": 800.0,
+                    "property_name": "Allen Oasis",
+                    "unit_id": 2
+                }
+            ]
+        }
+    """
+    try:
+        headers = request.headers
+        token = headers['Authorization']
+        user_id = get_user_id(connection, token)
+        if(not check_agent_role(connection, user_id)):
+            return jsonify({'success': False, 'error': "User is not an Agent"}), 409
+        query = (
+                f"SELECT u.unit_id, "
+                f"u.apartment_no, "
+                f"u.bedrooms, "
+                f"u.bathrooms, "
+                f"u.price, "
+                f"u.availability, "
+                f"u.area, "
+                f"p.name, "
+                f"p.pincode, "
+                f"p.company_id "
+                f"FROM unit u "
+                f"JOIN property p ON p.property_id = u.property_id "
+                f"JOIN agentcompanyrelationship acr ON acr.company_id = p.company_id "
+                f"WHERE acr.user_id = {user_id};"
+            )
+        rows = run_query(connection, query)
+
+        results = []
+        for row in rows:
+            results.append({
+                    'unit_id': row[0],
+                    'apartment_no': row[1],
+                    'bedrooms': row[2],
+                    'bathrooms': row[3],
+                    'price': row[4],
+                    'availability': row[5],
+                    'area': row[6],
+                    'property_name': row[7],
+                    'pincode': row[8],
+                    'company_id': row[9],
+                })
+        return jsonify({"data": results})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/api/submit_application', methods=['POST'])
 def submit_application():
     try:
