@@ -3,6 +3,7 @@ import mysql.connector
 from flask_cors import CORS
 import hashlib
 from utils import *
+from datetime import datetime
 
 configuration = load_backend_config()
 DB_CONFIG = configuration['DB_CONFIG']
@@ -113,14 +114,20 @@ def update_application():
             if status=="approved":
                 query = (f"UPDATE applications set status='{status}' where user_id = {user_id} and unit_id = {unit_id};"
                         f"UPDATE unit set availability=false where unit_id={unit_id};")
-                run_update_query(connection, query)
+                if not run_update_query(connection, query):
+                    success = False
+                    return jsonify({'success': success}), 409
+
+            elif status=="rejected":
+                query = f"UPDATE applications set status='{status}' where user_id = {user_id} and unit_id = {unit_id};"
+                if not run_update_query(connection, query):
+                    success = False
+                    return jsonify({'success': success}), 409   
         else:
             success = False
+            return jsonify({'success': success}), 409 
 
-        results = []
-        results.append({
-            'success': success
-        })
+        results = {'success': success}
         return jsonify(results)
 
     except Exception as e:
@@ -281,6 +288,30 @@ def get_unit_app_count():
                     'num_applications': row[2]
                 })
         return jsonify(results)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+@app.route('/api/submit_application', methods=['POST'])
+def submit_application():
+    try:
+        headers = request.headers
+        token = headers['Authorization']
+        user_id = get_user_id(connection, token)
+        if check_agent_role(connection, user_id):
+            return jsonify({'error': "User is an Agent"}), 403
+
+        data = request.json
+        unit_id = data.get('unit_id')
+        created_at = datetime.now().strftime('%Y-%m-%d')
+        success = True
+
+        query = (f"INSERT INTO applications (unit_id, user_id, created_at, status) "
+                f"VALUES ({unit_id}, {user_id}, '{created_at}', 'pending');")
+        if not run_update_query(connection, query):
+            success = False
+            return jsonify({'success': success}), 409
+        result = {'success': success}
+        return jsonify(result)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
