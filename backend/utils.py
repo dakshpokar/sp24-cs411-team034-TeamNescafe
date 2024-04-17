@@ -41,7 +41,6 @@ def check_agent_role(connection, user_id):
     """
     query = f"SELECT role_type from user where user_id = {user_id};"
     rows = run_query(connection, query)
-    print(rows[0])
     if rows[0][0]=="Agent":
         return True
     else:
