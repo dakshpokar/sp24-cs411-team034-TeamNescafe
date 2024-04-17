@@ -75,7 +75,56 @@ def login():
             return jsonify({'success': False, 'error': 'Invalid username or password'}), 401
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/get_unit_from_id', methods=['GET'])
+def get_unit_from_id():
+    try:
+        unit_id = request.args.get('unit_id')
+        query = f"SELECT u.apartment_no, u.bedrooms, u.bathrooms, u.price, u.availability, u.area , up.photo FROM unit u NATURAL JOIN unitphoto up where u.unit_id = {unit_id};"
+        rows = run_query(connection, query)
+
+        results = []
+        for row in rows:
+            results.append({
+                'apartment_no': row[0],
+                'bedrooms': row[1],
+                'bathrooms': row[2],
+                'price': row[3],
+                'availability': row[4],
+                'area': row[5],
+                'photo': row[6],
+            })
+        return jsonify(results)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
     
+@app.route('/api/update_application', methods=['POST'])
+def update_application():
+    try:
+        token = request.headers['Authorization']
+        agent_id = get_user_id(connection, token)
+        user_id = request.json.get('user_id')
+        unit_id = request.json.get('unit_id')
+        status = request.json.get('status')
+        success = True
+
+        if check_agent_role(connection, agent_id):
+            if status=="approved":
+                query = (f"UPDATE applications set status='{status}' where user_id = {user_id} and unit_id = {unit_id};"
+                        f"UPDATE unit set availability=false where unit_id={unit_id};")
+                run_update_query(connection, query)
+        else:
+            success = False
+
+        results = []
+        results.append({
+            'success': success
+        })
+        return jsonify(results)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/property_ratings_by_area', methods=['GET'])
 def property_ratings_by_area():
@@ -206,7 +255,10 @@ def min_max_rent():
 @app.route('/api/get_unit_app_count', methods=['GET'])
 def get_unit_app_count():
     try:
-        if not check_agent_role(user_id):
+        headers = request.headers
+        token = headers['Authorization']
+        user_id = get_user_id(connection, token)
+        if not check_agent_role(connection, user_id):
             return jsonify({'error': "User is not an Agent"}), 403
         query_params = request.args
         company_id = query_params['company_id']
