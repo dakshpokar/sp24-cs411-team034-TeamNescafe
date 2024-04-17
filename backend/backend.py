@@ -408,6 +408,7 @@ def submit_application():
         return jsonify(result)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 @app.route('/api/list_properties', methods=['GET'])
 def list_properties():
     try:
