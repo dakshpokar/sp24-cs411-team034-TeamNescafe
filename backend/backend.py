@@ -124,7 +124,7 @@ def update_application():
 @app.route('/api/sign_up', methods=['POST'])
 def sign_up():
     try:
-        data = request.form
+        data = request.json
         email_id = data['email_id']
         password_hash = hashlib.md5(data['password'].encode()).hexdigest()
         role_type = 'Customer'
@@ -138,17 +138,16 @@ def sign_up():
         if verify_unique_email(connection, email_id):
             query = (f"insert into user (email_id, password_hash, role_type, first_name, last_name, phone_number, gender, date_of_birth) "
                     f"VALUES ('{email_id}', '{password_hash}', '{role_type}', '{first_name}', '{last_name}', '{phone_number}', '{gender}', '{dob}');")
-            run_update_query(connection, query)
+            if not run_update_query(connection, query):
+                return jsonify({'success': False, 'message': "Failed to sign up"}), 409
         else:
-            return jsonify({'success': False, 'message': "Email Id is already in use!"})
+            return jsonify({'success': False, 'message': "Email Id is already in use!"}), 409
 
-        results = []
-        results.append({
-            'success': True, 'message':'Sign Up Successful'
-        })
+        results = {'success': True, 'message':'Sign Up Successful'}
         return jsonify(results)
 
     except Exception as e:
+        print(e)
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/property_ratings_by_area', methods=['GET'])
