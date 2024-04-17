@@ -377,5 +377,29 @@ def get_units_for_agent():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/list_properties', methods=['GET'])
+def list_properties():
+    try:
+        query = ("select p.property_id, p.name, c.name, p.address, p.pincode from property p JOIN company c ON p.company_id = c.company_id;")
+        rows = run_query(connection, query)
+
+        query2 = ("select * from propertyphoto;")
+        rows2 = run_query(connection, query2)
+
+        results = []
+        for row in rows:
+            results.append({
+                    'property_id': row[0],
+                    'property_name': row[1],
+                    'company_name': row[2],
+                    'address': row[3],
+                    'pincode': row[4],
+                    'photos':[row2[1] for row2 in rows2 if row2[0]==row[0]]
+                })
+        return jsonify(results)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+
 if __name__ == '__main__':
     app.run(debug=(ENV == 'dev'), port=PORT)
