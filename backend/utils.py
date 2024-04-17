@@ -43,10 +43,10 @@ def run_update_query(connection, query):
             return False
 
 def get_user_id(connection, token):
-    query = f"select user_id from tokens where token={token}"
+    query = f"select user_id from tokens where token='{token}'"
     rows = run_query(connection, query)
     if rows:
-        return rows[0]
+        return rows[0][0]
     else:
         return None
 
