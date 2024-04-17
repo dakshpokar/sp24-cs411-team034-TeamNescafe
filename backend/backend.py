@@ -316,7 +316,7 @@ def get_units_for_agent():
         token = headers['Authorization']
         user_id = get_user_id(connection, token)
         if(not check_agent_role(connection, user_id)):
-            return jsonify({'success': False, 'error': "User is not an Agent"}), 500
+            return jsonify({'success': False, 'error': "User is not an Agent"}), 409
         query = (
                 f"SELECT u.unit_id, "
                 f"u.apartment_no, "
