@@ -253,6 +253,52 @@ def apps_per_user():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/filter_units', methods=['GET'])
+def filter_units():
+    try:
+        data = request.json
+        bedrooms = data.get('bedrooms',-1)
+        bathrooms = data.get('bathrooms',-1)
+        pricemin = data.get('pricemin',-1)
+        pricemax = data.get('pricemax',-1)
+        areamin = data.get('areamin',-1)
+        areamax = data.get('areamax',-1)
+        query = (f"SELECT u.apartment_no, u.bedrooms, u.bathrooms, u.area, u.price, u.availability, up.photo FROM unit u NATURAL JOIN unitphoto up WHERE ")
+        if bedrooms != -1:
+            query = query + f"u.bedrooms={bedrooms} and "
+        if bathrooms != -1:
+            query = query + f"u.bathrooms={bathrooms} and " 
+        if areamin != -1:
+            query = query + f"u.area>={areamin} and "
+        if areamax != -1:
+            query = query + f"u.area<={areamax} and "
+        if pricemin != -1:
+            query = query + f"u.price>={pricemin} and "
+        if pricemax != -1:
+            query = query + f"u.price<={pricemax} and "
+        if query.endswith("and "):
+            query = query[:-4]
+        elif query.endswith("WHERE "):
+            query = query[:-6]
+        query = query + ";"
+        rows = run_query(connection, query)
+
+        results = []
+        for row in rows:
+            results.append({
+                'apartment_no': row[0],
+                'bedrooms': row[1],
+                'bathrooms': row[2],
+                'area': row[3],
+                'price': row[4],
+                'availability': row[5],
+                'photo': row[6]
+            })
+        return jsonify(results)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/min_max_rent', methods=['GET'])
 def min_max_rent():
     try:
