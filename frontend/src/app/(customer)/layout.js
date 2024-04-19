@@ -24,13 +24,13 @@ export default function CustomerLayout({ children }) {
 							</div>
 							<div className='flex-1 overflow-auto py-2'>
 								<nav className='grid items-start px-4 text-sm font-medium'>
-									<NavItem href='/properties'>
+									<NavItem where='/properties'>
 										Properties
 									</NavItem>
-									<NavItem href='/roommates'>
+									<NavItem where='/roommates'>
 										Roommates
 									</NavItem>
-									<NavItem href='/my_applications'>
+									<NavItem where='/my_applications'>
 										My Applications
 									</NavItem>
 								</nav>
