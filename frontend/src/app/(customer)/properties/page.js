@@ -12,19 +12,19 @@ const Properties = () => {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [propertiesPerPage] = useState(6); // Adjust this value as needed
 
-	const fetchOnce = useCallback(() => {
+	// const fetchOnce = useCallback(() => {
+	// 	apiService.listProperties().then((propertiesData) => {
+	// 		setProperties(propertiesData);
+	// 	});
+	// 	console.log('Calling Blach');
+	// });
+	useEffect(() => {
+		// Fetch properties data from an API
 		apiService.listProperties().then((propertiesData) => {
 			setProperties(propertiesData);
 		});
-		console.log('Calling Blach');
-	});
-	useEffect(() => {
-		// Fetch properties data from an API
-		// apiService.listProperties().then((propertiesData) => {
-		// 	setProperties(propertiesData);
-		// });
-		fetchOnce();
-	}, [fetchOnce]);
+		// fetchOnce();
+	}, []);
 
 	const pageNumbers = [];
 	for (
