@@ -7,6 +7,10 @@ jobs:
       - name: Repository Checkout
         uses: actions/checkout@v4
 
+      - name: Setup SuiteMate
+        run: |
+          cd frontend
+
       - name: Setup NodeJS
         uses: actions/setup-node@v4
         with:
