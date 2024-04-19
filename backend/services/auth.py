@@ -82,7 +82,7 @@ def sign_up():
         print(e)
         return jsonify({'error': str(e)}), 500
 
-@auth_service.route('/api/sign_out', methods=['POST'])
+@auth_service.route('/sign_out', methods=['POST'])
 def sign_out():
     try:
         data = request.json
