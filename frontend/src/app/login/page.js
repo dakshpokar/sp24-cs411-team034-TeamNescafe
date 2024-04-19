@@ -1,10 +1,12 @@
 'use client';
 import { useState } from 'react';
 import apiService from '@/controllers/apiService';
+import { useRouter } from 'next/navigation';
 
 const LoginPage = () => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
+	const { push } = useRouter();
 
 	const handleEmailChange = (e) => {
 		setEmail(e.target.value);
@@ -28,6 +30,18 @@ const LoginPage = () => {
 
 					// window.location.href = '/properties';
 					alert('Logged in successfully');
+					const user = localStorage.getItem('user');
+					if (user) {
+						const userObj = JSON.parse(user);
+
+						const roleType = userObj.role_type;
+
+						if (roleType === 'Agent') {
+							push('/agent_dashboard');
+						} else {
+							push('/properties');
+						}
+					}
 				}
 			})
 			.catch((error) => {
