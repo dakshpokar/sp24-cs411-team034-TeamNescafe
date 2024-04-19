@@ -41,7 +41,8 @@ const post = async (endpoint, data, isAuthorised = false) => {
 const apiService = {
 	login: async (data) => post('login', data),
 	signup: async (data) => post('sign_up', data),
-	listProperties: async (token) => get('list_properties'),
+	listProperties: async () => get('list_properties'),
+	myApplications: async () => get('my_applications', true),
 };
 
 export default apiService;
