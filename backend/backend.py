@@ -293,52 +293,6 @@ def apps_per_user():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/filter_units', methods=['GET'])
-def filter_units():
-    try:
-        data = request.json
-        bedrooms = data.get('bedrooms',-1)
-        bathrooms = data.get('bathrooms',-1)
-        pricemin = data.get('pricemin',-1)
-        pricemax = data.get('pricemax',-1)
-        areamin = data.get('areamin',-1)
-        areamax = data.get('areamax',-1)
-        query = (f"SELECT u.apartment_no, u.bedrooms, u.bathrooms, u.area, u.price, u.availability, up.photo FROM unit u NATURAL JOIN unitphoto up WHERE ")
-        if bedrooms != -1:
-            query = query + f"u.bedrooms={bedrooms} and "
-        if bathrooms != -1:
-            query = query + f"u.bathrooms={bathrooms} and " 
-        if areamin != -1:
-            query = query + f"u.area>={areamin} and "
-        if areamax != -1:
-            query = query + f"u.area<={areamax} and "
-        if pricemin != -1:
-            query = query + f"u.price>={pricemin} and "
-        if pricemax != -1:
-            query = query + f"u.price<={pricemax} and "
-        if query.endswith("and "):
-            query = query[:-4]
-        elif query.endswith("WHERE "):
-            query = query[:-6]
-        query = query + ";"
-        rows = run_query(connection, query)
-
-        results = []
-        for row in rows:
-            results.append({
-                'apartment_no': row[0],
-                'bedrooms': row[1],
-                'bathrooms': row[2],
-                'area': row[3],
-                'price': row[4],
-                'availability': row[5],
-                'photo': row[6]
-            })
-        return jsonify(results)
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
 @app.route('/api/min_max_rent', methods=['GET'])
 def min_max_rent():
     try:
@@ -501,7 +455,40 @@ def submit_application():
 @app.route('/api/list_properties', methods=['GET'])
 def list_properties():
     try:
-        query = ("select p.property_id, p.name, c.name, p.address, p.pincode from property p JOIN company c ON p.company_id = c.company_id;")
+        data = request.args
+        bedrooms = data.get('bedrooms',-1)
+        bathrooms = data.get('bathrooms',-1)
+        pricemin = data.get('pricemin',-1)
+        pricemax = data.get('pricemax',-1)
+        areamin = data.get('areamin',-1)
+        areamax = data.get('areamax',-1)
+        pincode = data.get('pincode',-1)
+        propertyName = data.get('propertyName',-1)
+        companyName = data.get('companyName',-1)
+        query = ("select p.property_id, p.name, c.name, p.address, p.pincode from property p JOIN company c ON p.company_id = c.company_id JOIN unit u ON u.property_id = p.property_id")
+        whereParts = []
+        if bedrooms != -1:
+            whereParts.append(f"u.bedrooms={bedrooms}")
+        if bathrooms != -1:
+            whereParts.append(f"u.bathrooms={bathrooms}")
+        if areamin != -1:
+            whereParts.append(f"u.area>={areamin}")
+        if areamax != -1:
+            whereParts.append(f"u.area>={areamax}")
+        if pricemin != -1:
+            whereParts.append(f"u.price>={pricemin}")
+        if pricemax != -1:
+            whereParts.append(f"u.price<={pricemax}")
+        if pincode != -1:
+            whereParts.append(f"p.pincode={pincode}")
+        if propertyName != -1:
+            whereParts.append(f"p.name LIKE '%{propertyName}%'")
+        if companyName != -1:
+            whereParts.append(f"c.name LIKE '%{companyName}%'")
+        if len(whereParts)>0:
+            query += " WHERE "
+            query += " and ".join(whereParts)
+        query += ';'
         rows = run_query(connection, query)
 
         query2 = ("select * from propertyphoto;")
