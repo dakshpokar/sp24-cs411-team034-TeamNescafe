@@ -13,6 +13,7 @@ const Properties = () => {
 		apiService.listProperties().then((propertiesData) => {
 			setProperties(propertiesData);
 		});
+		
 	}, []);
 
 	return (

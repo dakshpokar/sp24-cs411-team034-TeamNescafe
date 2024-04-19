@@ -465,7 +465,7 @@ def list_properties():
         pincode = data.get('pincode',-1)
         propertyName = data.get('propertyName',-1)
         companyName = data.get('companyName',-1)
-        query = ("select p.property_id, p.name, c.name, p.address, p.pincode from property p JOIN company c ON p.company_id = c.company_id JOIN unit u ON u.property_id = p.property_id")
+        query = ("select distinct p.property_id, p.name, c.name, p.address, p.pincode from property p JOIN company c ON p.company_id = c.company_id JOIN unit u ON u.property_id = p.property_id")
         whereParts = []
         if bedrooms != -1:
             whereParts.append(f"u.bedrooms={bedrooms}")
@@ -503,6 +503,30 @@ def list_properties():
                     'address': row[3],
                     'pincode': row[4],
                     'photos':[row2[1] for row2 in rows2 if row2[0]==row[0]]
+                })
+        return jsonify(results)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+@app.route('/api/my_applications', methods=['GET'])
+def my_applications():
+    try:
+        token = request.headers['Authorization']
+        user_id = get_user_id(connection, token)
+        query = (f"SELECT u.apartment_no, p.name, u.price, a.status "
+                f"FROM applications a "
+                f"JOIN unit u ON u.unit_id = a.unit_id "
+                f"JOIN property p ON p.property_id = u.property_id "
+                f"WHERE a.user_id = {user_id}; ")
+        rows = run_query(connection, query)
+
+        results = []
+        for row in rows:
+            results.append({
+                    'apartment_no': row[0],
+                    'property_name': row[1],
+                    'price': row[2],
+                    'status': row[3]
                 })
         return jsonify(results)
     except Exception as e:

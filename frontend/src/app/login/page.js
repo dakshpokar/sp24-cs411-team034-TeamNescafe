@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import apiService from '@/controllers/apiService';
 import { useRouter } from 'next/navigation';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const LoginPage = () => {
 	const [email, setEmail] = useState('');
@@ -27,9 +29,7 @@ const LoginPage = () => {
 						'user',
 						JSON.stringify(response.user)
 					);
-
-					// window.location.href = '/properties';
-					alert('Logged in successfully');
+					toast.success('Success Notification !');
 					const user = localStorage.getItem('user');
 					if (user) {
 						const userObj = JSON.parse(user);
@@ -46,6 +46,7 @@ const LoginPage = () => {
 			})
 			.catch((error) => {
 				console.log(error);
+				toast.error('Could not Login!');
 			});
 	};
 
@@ -96,6 +97,7 @@ const LoginPage = () => {
 					</button>
 				</div>
 			</form>
+			<ToastContainer />
 		</div>
 	);
 };

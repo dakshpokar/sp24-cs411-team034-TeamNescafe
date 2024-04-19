@@ -30,7 +30,7 @@ export default function CustomerLayout({ children }) {
 									<NavItem href='/roommates'>
 										Roommates
 									</NavItem>
-									<NavItem href='/my-applications'>
+									<NavItem href='/my_applications'>
 										My Applications
 									</NavItem>
 								</nav>
