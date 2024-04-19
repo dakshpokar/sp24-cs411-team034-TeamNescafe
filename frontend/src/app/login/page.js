@@ -15,7 +15,6 @@ const LoginPage = () => {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		// Add your login logic here
 	};
 
 	return (

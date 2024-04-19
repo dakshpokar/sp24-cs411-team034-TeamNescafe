@@ -157,6 +157,23 @@ def sign_up():
         print(e)
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/sign_out', methods=['POST'])
+def sign_out():
+    try:
+        data = request.json
+        token = data['token']
+        query = (f"delete from tokens where token = '{token}'")
+        if not run_update_query(connection, query):
+            return jsonify({'success': False, 'message': "Failed to sign out"}), 409
+
+        results = {'success': True, 'message':'Signed Out Successful'}
+        return jsonify(results)
+
+    except Exception as e:
+        print(e)
+        return jsonify({'error': str(e)}), 500
+    
+
 @app.route('/api/property_ratings_by_area', methods=['GET'])
 def property_ratings_by_area():
     try:
@@ -291,17 +308,19 @@ def get_unit_app_count():
         user_id = get_user_id(connection, token)
         if not check_agent_role(connection, user_id):
             return jsonify({'error': "User is not an Agent"}), 403
-        query_params = request.args
-        company_id = query_params['company_id']
         
+        query = (f"select company_id from agentcompanyrelationship where user_id={user_id}")
+        company_id = run_query(connection, query)[0][0]
+        print(company_id)
+
         query = (f"SELECT u.apartment_no, "
                 f"p.name, "
-                f"COUNT(*) "
+                f"COUNT(*) as app_count "
                 f"FROM unit u "
                 f"JOIN property p ON p.property_id = u.property_id "
                 f"JOIN applications app ON app.unit_id = u.unit_id "
                 f"WHERE p.company_id = {company_id} "
-                f"GROUP BY u.unit_id;")
+                f"GROUP BY u.unit_id order by app_count desc;")
         rows = run_query(connection, query)
 
         results = []
@@ -313,6 +332,7 @@ def get_unit_app_count():
                 })
         return jsonify(results)
     except Exception as e:
+        print(e)
         return jsonify({'error': str(e)}), 500
     
 

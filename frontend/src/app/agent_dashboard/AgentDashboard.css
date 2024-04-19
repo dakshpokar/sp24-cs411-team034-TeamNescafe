@@ -1,0 +1,38 @@
+.agent-dashboard {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    color: black; 
+}
+
+.agent-dashboard h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: black; 
+}
+
+.dashboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: black;
+}
+
+.dashboard-table th {
+    padding: 10px;
+    background-color: #e0e0e0;
+    text-align: left;
+    color: black; 
+}
+
+.dashboard-table td {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    color: black;
+}
+
+.dashboard-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+    color: black; 
+}
