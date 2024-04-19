@@ -13,6 +13,7 @@ VERSION = configuration['VERSION']
 
 app = Flask(f"SuiteMate Server v{VERSION}")
 CORS(app)
+# CORS(app, resources={r"/": {"origins": ""}})
 
 def connect_to_database():
     try:
