@@ -212,6 +212,29 @@ def property_ratings_by_area():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/similarity_ratio', methods=['GET'])
+def similarity_ratio():
+    try:
+        token = request.headers['Authorization']
+        user_id = get_user_id(connection, token)
+        query = (f"SELECT u.user_id,u.first_name,u.last_name,((SELECT COUNT(*) FROM userdetails ud WHERE ud.user_id = u.user_id AND "
+                f"ud.value IN (SELECT value FROM userdetails WHERE user_id = 1000 AND ud.pref_id = pref_id)) / "
+                    f"(SELECT COUNT(*) FROM userdetails WHERE user_id = {user_id})) AS similarity_score "
+            f"FROM user u JOIN userdetails ud ON u.user_id = ud.user_id WHERE u.user_id != {user_id} GROUP BY u.user_id "
+            f"ORDER BY similarity_score DESC;")
+        rows = run_query(connection, query)
+        results = []
+        for row in rows:
+            results.append({
+                'user_id': row[0],
+                'first_name': row[1],
+                'last_name': row[2],
+                'similarity_ratio': row[3]
+            })
+        return jsonify(results)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/popular_properties', methods=['GET'])
 def popular_properties():
     try:
@@ -432,7 +455,40 @@ def submit_application():
 @app.route('/api/list_properties', methods=['GET'])
 def list_properties():
     try:
-        query = ("select p.property_id, p.name, c.name, p.address, p.pincode from property p JOIN company c ON p.company_id = c.company_id;")
+        data = request.args
+        bedrooms = data.get('bedrooms',-1)
+        bathrooms = data.get('bathrooms',-1)
+        pricemin = data.get('pricemin',-1)
+        pricemax = data.get('pricemax',-1)
+        areamin = data.get('areamin',-1)
+        areamax = data.get('areamax',-1)
+        pincode = data.get('pincode',-1)
+        propertyName = data.get('propertyName',-1)
+        companyName = data.get('companyName',-1)
+        query = ("select p.property_id, p.name, c.name, p.address, p.pincode from property p JOIN company c ON p.company_id = c.company_id JOIN unit u ON u.property_id = p.property_id")
+        whereParts = []
+        if bedrooms != -1:
+            whereParts.append(f"u.bedrooms={bedrooms}")
+        if bathrooms != -1:
+            whereParts.append(f"u.bathrooms={bathrooms}")
+        if areamin != -1:
+            whereParts.append(f"u.area>={areamin}")
+        if areamax != -1:
+            whereParts.append(f"u.area>={areamax}")
+        if pricemin != -1:
+            whereParts.append(f"u.price>={pricemin}")
+        if pricemax != -1:
+            whereParts.append(f"u.price<={pricemax}")
+        if pincode != -1:
+            whereParts.append(f"p.pincode={pincode}")
+        if propertyName != -1:
+            whereParts.append(f"p.name LIKE '%{propertyName}%'")
+        if companyName != -1:
+            whereParts.append(f"c.name LIKE '%{companyName}%'")
+        if len(whereParts)>0:
+            query += " WHERE "
+            query += " and ".join(whereParts)
+        query += ';'
         rows = run_query(connection, query)
 
         query2 = ("select * from propertyphoto;")
