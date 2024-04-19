@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import apiService from '@/controllers/apiService';
 
 const LoginPage = () => {
 	const [email, setEmail] = useState('');
@@ -15,6 +16,23 @@ const LoginPage = () => {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
+		apiService
+			.login({ email, password })
+			.then((response) => {
+				if (response.token) {
+					localStorage.setItem('token', response.token);
+					localStorage.setItem(
+						'user',
+						JSON.stringify(response.user)
+					);
+
+					// window.location.href = '/properties';
+					alert('Logged in successfully');
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+			});
 	};
 
 	return (
