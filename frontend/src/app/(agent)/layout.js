@@ -27,7 +27,7 @@ export default function CustomerLayout({ children }) {
 									<NavItem where='/dashboard'>
 										Applications
 									</NavItem>
-									<NavItem where='/#'>
+									<NavItem where='/analytics'>
 										Analytics
 									</NavItem>
 									{/* <NavItem where='/my_applications'>

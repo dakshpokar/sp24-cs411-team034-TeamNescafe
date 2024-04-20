@@ -14,13 +14,17 @@ export default function Home() {
 				<Link href='/login'>
 					<h2 className='text-2xl font-semibold transition-transform group-hover:translate-x-1 motion-reduce:transform-none inline-block mb-6 lg:mb-0'>
 						Login{' '}
-						<span className='inline-block'>-&gt;</span>
+						<span className='inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none'>
+							-&gt;
+						</span>
 					</h2>
 				</Link>
 				<Link href='/register'>
 					<h2 className='text-2xl font-semibold transition-transform group-hover:translate-x-1 motion-reduce:transform-none inline-block'>
 						Register{' '}
-						<span className='inline-block'>-&gt;</span>
+						<span className='inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none'>
+							-&gt;
+						</span>
 					</h2>
 				</Link>
 			</div>
