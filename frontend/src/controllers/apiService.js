@@ -43,6 +43,7 @@ const apiService = {
 	signup: async (data) => post('auth/sign_up', data),
 	listProperties: async () => get('customer/list_properties'),
 	myApplications: async () => get('customer/my_applications', true),
+	agentDashboard: async () => get('agent/get_unit_app_count', true),
 };
 
 export default apiService;
