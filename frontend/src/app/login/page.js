@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 const LoginPage = () => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
+	const [isLoading, setIsLoading] = useState(false);
 	const { push } = useRouter();
 
 	const handleEmailChange = (e) => {
@@ -20,6 +21,8 @@ const LoginPage = () => {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
+		if(isLoading) return;
+		setIsLoading(true);
 		apiService
 			.login({ email, password })
 			.then((response) => {
@@ -35,7 +38,7 @@ const LoginPage = () => {
 						const userObj = JSON.parse(user);
 
 						const roleType = userObj.role_type;
-
+						
 						if (roleType === 'Agent') {
 							push('/dashboard');
 						} else {
@@ -45,6 +48,7 @@ const LoginPage = () => {
 				}
 			})
 			.catch((error) => {
+				setIsLoading(false);
 				console.log(error);
 				toast.error('Could not Login!');
 			});
@@ -113,7 +117,7 @@ const LoginPage = () => {
 								type='submit'
 								className='flex w-full justify-center rounded-md bg-orange-400 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-orange-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600'
 							>
-								Sign in
+								{isLoading ? 'Loading...' : 'Sign in'}
 							</button>
 						</div>
 					</form>

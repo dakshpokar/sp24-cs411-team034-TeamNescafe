@@ -93,7 +93,5 @@ def sign_out():
 
         results = {'success': True, 'message':'Signed Out Successful'}
         return jsonify(results)
-
     except Exception as e:
-        print(e)
         return jsonify({'error': str(e)}), 500

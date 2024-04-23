@@ -2,16 +2,23 @@
 
 import apiService from '@/controllers/apiService';
 import { useState, useEffect } from 'react';
+import SuiteMateLoader from '@/components/loader';
 
 const Roommates = () => {
 	const [roommates, setRoommates] = useState([]);
 	const [filteredRoommates, setFilteredRoomates] = useState([]);
 	const [search, setSearch] = useState('');
+	const [isLoading, setIsLoading] = useState(false);
 
 	useEffect(() => {
+		setIsLoading(true);
 		apiService.getRoommates().then((roommatesData) => {
 			setRoommates(roommatesData);
 			setFilteredRoomates(roommatesData);
+			setIsLoading(false);
+		}).catch((error) => {
+			setIsLoading(false);
+			console.log(error);
 		});
 	}, []);
 
@@ -28,6 +35,9 @@ const Roommates = () => {
 					Roommates
 				</h1>
 			</div>
+			{isLoading && <SuiteMateLoader />}
+			{!isLoading && filteredRoommates.length === 0 && <p>No roommates found</p>}
+			{!isLoading && filteredRoommates.length > 0 && <div>
 			<input type='text' placeholder='Search' className='p-2 border rounded-md' onChange={(e)=>setSearch(e.target.value)} />
 			<div className='overflow-x-auto'>
 				<table className='min-w-full'>
@@ -62,6 +72,7 @@ const Roommates = () => {
 					</tbody>
 				</table>
 			</div>
+			</div>}
 		</main>
 	);
 }
