@@ -120,7 +120,7 @@ def list_properties():
 def get_property_from_id():
     try:
         property_id = request.args.get('property_id')
-        query = f"SELECT * FROM property where property_id = {property_id};"
+        query = f"SELECT p.name, p.address, p.latitude, p.longitude, c.name, p.pincode FROM property as p join company as c on p.company_id=c.company_id where p.property_id = {property_id};"
         rows = run_query(connection, query)
 
         query2 = (f"select * from propertyphoto where property_id = {property_id};")
@@ -129,13 +129,12 @@ def get_property_from_id():
         results = []
         for row in rows:
             results.append({
-                    'property_id': row[0],
-                    'name': row[1],
-                    'address': row[2],
-                    'latitude': row[3],
-                    'longitude': row[4],
-                    'company_id': row[5],
-                    'pincode': row[6],
+                    'name': row[0],
+                    'address': row[1],
+                    'latitude': row[2],
+                    'longitude': row[3],
+                    'company_name': row[4],
+                    'pincode': row[5],
                     'photos':[row2[1] for row2 in rows2]
                 })
         return jsonify(results[0])
