@@ -151,7 +151,6 @@ def get_roommates():
             f"(SELECT COUNT(*) FROM userdetails WHERE user_id = {user_id})) AS similarity_score "
             f"FROM user u JOIN userdetails ud ON u.user_id = ud.user_id WHERE u.user_id != {user_id} GROUP BY u.user_id "
             f"ORDER BY similarity_score DESC;")
-        print(query)
         rows = run_query(connection, query)
         results = []
         for row in rows:
