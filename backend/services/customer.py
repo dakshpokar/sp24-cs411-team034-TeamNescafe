@@ -169,18 +169,17 @@ def my_applications():
 def get_property_reviews():
     try:
         property_id = request.args.get('property_id')
-        query = f"SELECT u.first_name, u.last_name, r.created_at, r.comment, r.rating FROM reviews as r join user as u on r.user_id = u.user_id where r.property_id = {property_id};"
+        query = f"SELECT u.first_name, u.last_name, r.created_at, r.comment, r.rating FROM reviews as r join user as u on r.user_id=u.user_id where r.property_id = {property_id};"
         rows = run_query(connection, query)
 
         results = []
-        for row in rows:
-            results.append({
-                    'user_name': row[0] + ' ' + row[1],
-                    'created_at': row[2],
-                    'comment': row[3],
-                    'rating': row[4]
-                })
-        return jsonify(results)
+        results.append({
+                'user_name': [row[0] + ' ' + row[1] for row in rows],
+                'created_at': [row[2] for row in rows],
+                'comment': [row[3] for row in rows],
+                'rating': [row[4] for row in rows]
+            })
+        return jsonify(results[0])
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
