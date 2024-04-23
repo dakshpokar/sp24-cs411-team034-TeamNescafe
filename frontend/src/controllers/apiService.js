@@ -3,7 +3,7 @@ import axios from 'axios';
 const baseURL = process.env.BASEURL;
 console.log('baseURL', baseURL);
 
-const get = async (endpoint, isAuthorised = false) => {
+const get = async (endpoint, isAuthorised = false, params = {}) => {
 	let headers = {};
 	try {
 		if (isAuthorised) {
@@ -13,6 +13,7 @@ const get = async (endpoint, isAuthorised = false) => {
 
 		const response = await axios.get(baseURL + endpoint, {
 			headers,
+			params
 		});
 		return response.data;
 	} catch (error) {
@@ -45,6 +46,7 @@ const apiService = {
 	myApplications: async () => get('customer/my_applications', true),
 	agentDashboard: async () => get('agent/get_unit_app_count', true),
 	getRoommates: async () => get('customer/get_roommates', true),
+	unitDetails: async (params) => get('agent/get_unit_from_id', true, params)
 };
 
 export default apiService;
