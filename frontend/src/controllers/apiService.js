@@ -47,7 +47,8 @@ const apiService = {
 	agentDashboard: async () => get('agent/get_unit_app_count', true),
 	getRoommates: async () => get('customer/get_roommates', true),
 	unitDetails: async (params) => get('agent/get_unit_from_id', true, params),
-	propertyDetails: async (params) => get('customer/get_property_from_id', true, params)
+	propertyDetails: async (params) => get('customer/get_property_from_id', true, params),
+	getPropertyReviews: async (params) => get('customer/get_property_reviews', true, params)
 };
 
 export default apiService;
