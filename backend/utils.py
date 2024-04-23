@@ -1,6 +1,7 @@
 import json
 import secrets
 import string
+import os
 
 def load_backend_config():
     """This loads backend config
@@ -23,7 +24,10 @@ def load_backend_config():
         }
     """
     try:
-        with open('./backend/configs/config.json') as f:
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        config_path = os.path.join(script_dir, 'configs/config.json')
+
+        with open(config_path) as f:
             return json.load(f)
     except Exception as e:
         print("Error Loading Configuration File:", e)
