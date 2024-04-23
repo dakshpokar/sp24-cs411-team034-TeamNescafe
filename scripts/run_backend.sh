@@ -1,2 +1,2 @@
 source ./.venv/bin/activate
-python backend/backend.py
+python backend/main.py
