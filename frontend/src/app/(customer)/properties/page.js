@@ -6,11 +6,13 @@ import {
 import { useState, useEffect, useCallback } from 'react';
 import apiService from '@/controllers/apiService';
 import Image from 'next/image';
+import SuiteMateLoader from '@/components/loader';
 
 const Properties = () => {
 	const [properties, setProperties] = useState([]);
 	const [currentPage, setCurrentPage] = useState(1);
 	const [propertiesPerPage] = useState(6); // Adjust this value as needed
+	const [isLoading, setIsLoading] = useState(true);
 
 	// const fetchOnce = useCallback(() => {
 	// 	apiService.listProperties().then((propertiesData) => {
@@ -20,8 +22,13 @@ const Properties = () => {
 	// });
 	useEffect(() => {
 		// Fetch properties data from an API
+		setIsLoading(true);
 		apiService.listProperties().then((propertiesData) => {
 			setProperties(propertiesData);
+			setIsLoading(false);
+		}).catch((error) => {
+			console.error('Error fetching properties data:', error);
+			setIsLoading(false);
 		});
 		// fetchOnce();
 	}, []);
@@ -153,66 +160,73 @@ const Properties = () => {
 				</h1>
 			</div>
 
-			<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-				{currentProperties.map((property) => (
-					<div
-						key={property.property_id}
-						className='bg-white rounded-lg shadow-md p-4'
-					>
-						<div className='relative w-full h-40 mb-4'>
-							<Image
-								src={property.photos[0]}
-								layout='fill'
-								alt='PropertyPhoto'
-							/>
-						</div>
+			{isLoading && (<SuiteMateLoader />)}
+			{!isLoading && currentProperties.length === 0 && <p>No properties found</p>}
+			{!isLoading && currentProperties.length > 0 && (
+				<div>
+				<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+					{currentProperties.map((property) => (
+							<div
+								key={property.property_id}
+								className='bg-white rounded-lg shadow-md p-4'
+							>
+								<div className='relative w-full h-40 mb-4'>
+									<Image
+										src={property.photos[0]}
+										layout='fill'
+										alt='PropertyPhoto'
+									/>
+								</div>
 
-						<h2 className='text-xl font-semibold mb-2'>
-							{property.property_name}
-						</h2>
+								<h2 className='text-xl font-semibold mb-2'>
+									{property.property_name}
+								</h2>
 
-						<p className='text-gray-600 mb-2'>
-							{property.address}, {property.pincode}
-						</p>
+								<p className='text-gray-600 mb-2'>
+									{property.address}, {property.pincode}
+								</p>
 
-						<p className='text-gray-500'>
-							{property.company_name}
-						</p>
+								<p className='text-gray-500'>
+									{property.company_name}
+								</p>
+							</div>
+						))}
+				</div>
+
+					{/* Pagination */}
+					<div className='flex items-center justify-center mt-4'>
+						<nav className='flex flex-wrap gap-2'>
+							<button
+								onClick={() => paginate(currentPage - 1)}
+								disabled={currentPage === 1}
+								className='px-3 py-1 bg-gray-200 rounded-md disabled:opacity-50'
+							>
+								<ChevronLeftIcon
+									className='h-5 w-5'
+									aria-hidden='true'
+								/>
+							</button>
+							{renderPageNumbers()}
+							<button
+								onClick={() => paginate(currentPage + 1)}
+								disabled={
+									currentPage ===
+									Math.ceil(
+										properties.length / propertiesPerPage
+									)
+								}
+								className='px-3 py-1 bg-gray-200 rounded-md disabled:opacity-50'
+							>
+								<ChevronRightIcon
+									className='h-5 w-5'
+									aria-hidden='true'
+								/>
+							</button>
+						</nav>
 					</div>
-				))}
-			</div>
+				</div>
+			)}
 
-			{/* Pagination */}
-			<div className='flex items-center justify-center mt-4'>
-				<nav className='flex flex-wrap gap-2'>
-					<button
-						onClick={() => paginate(currentPage - 1)}
-						disabled={currentPage === 1}
-						className='px-3 py-1 bg-gray-200 rounded-md disabled:opacity-50'
-					>
-						<ChevronLeftIcon
-							className='h-5 w-5'
-							aria-hidden='true'
-						/>
-					</button>
-					{renderPageNumbers()}
-					<button
-						onClick={() => paginate(currentPage + 1)}
-						disabled={
-							currentPage ===
-							Math.ceil(
-								properties.length / propertiesPerPage
-							)
-						}
-						className='px-3 py-1 bg-gray-200 rounded-md disabled:opacity-50'
-					>
-						<ChevronRightIcon
-							className='h-5 w-5'
-							aria-hidden='true'
-						/>
-					</button>
-				</nav>
-			</div>
 		</main>
 	);
 };
