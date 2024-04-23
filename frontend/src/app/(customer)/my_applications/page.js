@@ -7,8 +7,6 @@ const MyApplications = () => {
 	const [applications, setApplications] = useState([]);
 
 	useEffect(() => {
-		// Fetch applications data from an API
-		// For demonstration purposes, let's assume applicationsData is the fetched data
 		apiService.myApplications().then((applicationsData) => {
 			setApplications(applicationsData);
 		});

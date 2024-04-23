@@ -139,3 +139,28 @@ def my_applications():
         return jsonify(results)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@customer_service.route('/get_roommates', methods=['GET'])
+def get_roommates():
+    try:
+        token = request.headers['Authorization']
+        user_id = get_user_id(connection, token)
+        query = (
+            f"SELECT u.user_id,u.first_name,u.last_name,((SELECT COUNT(*) FROM userdetails ud WHERE ud.user_id = u.user_id AND "
+            f"ud.value IN (SELECT value FROM userdetails WHERE user_id = {user_id} AND ud.pref_id = pref_id)) / "
+            f"(SELECT COUNT(*) FROM userdetails WHERE user_id = {user_id})) AS similarity_score "
+            f"FROM user u JOIN userdetails ud ON u.user_id = ud.user_id WHERE u.user_id != {user_id} GROUP BY u.user_id "
+            f"ORDER BY similarity_score DESC;")
+        print(query)
+        rows = run_query(connection, query)
+        results = []
+        for row in rows:
+            results.append({
+                'user_id': row[0],
+                'first_name': row[1],
+                'last_name': row[2],
+                'similarity_ratio': row[3]
+            })
+        return jsonify(results)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
