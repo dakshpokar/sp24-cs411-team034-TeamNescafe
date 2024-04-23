@@ -115,7 +115,33 @@ def list_properties():
         return jsonify(results)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
+
+@customer_service.route('/get_property_from_id', methods=['GET'])
+def get_property_from_id():
+    try:
+        property_id = request.args.get('property_id')
+        query = f"SELECT * FROM property where property_id = {property_id};"
+        rows = run_query(connection, query)
+
+        query2 = (f"select * from propertyphoto where property_id = {property_id};")
+        rows2 = run_query(connection, query2)
+
+        results = []
+        for row in rows:
+            results.append({
+                    'property_id': row[0],
+                    'name': row[1],
+                    'address': row[2],
+                    'latitude': row[3],
+                    'longitude': row[4],
+                    'company_id': row[5],
+                    'pincode': row[6],
+                    'photos':[row2[1] for row2 in rows2]
+                })
+        return jsonify(results[0])
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @customer_service.route('/my_applications', methods=['GET'])
 def my_applications():
     try:
