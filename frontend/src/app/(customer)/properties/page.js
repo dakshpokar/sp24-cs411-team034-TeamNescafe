@@ -7,6 +7,7 @@ import { useState, useEffect, useCallback } from 'react';
 import apiService from '@/controllers/apiService';
 import Image from 'next/image';
 import SuiteMateLoader from '@/components/loader';
+import Link from 'next/link';
 
 const Properties = () => {
 	const [properties, setProperties] = useState([]);
@@ -166,30 +167,32 @@ const Properties = () => {
 				<div>
 				<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
 					{currentProperties.map((property) => (
-							<div
-								key={property.property_id}
-								className='bg-white rounded-lg shadow-md p-4'
-							>
-								<div className='relative w-full h-40 mb-4'>
-									<Image
-										src={property.photos[0]}
-										layout='fill'
-										alt='PropertyPhoto'
-									/>
+							<Link href={`/property/${property.property_id}`}>
+								<div
+									key={property.property_id}
+									className='bg-white rounded-lg shadow-md p-4'
+								>
+									<div className='relative w-full h-40 mb-4'>
+										<Image
+											src={property.photos[0]}
+											layout='fill'
+											alt='PropertyPhoto'
+										/>
+									</div>
+
+									<h2 className='text-xl font-semibold mb-2'>
+										{property.property_name}
+									</h2>
+
+									<p className='text-gray-600 mb-2'>
+										{property.address}, {property.pincode}
+									</p>
+
+									<p className='text-gray-500'>
+										{property.company_name}
+									</p>
 								</div>
-
-								<h2 className='text-xl font-semibold mb-2'>
-									{property.property_name}
-								</h2>
-
-								<p className='text-gray-600 mb-2'>
-									{property.address}, {property.pincode}
-								</p>
-
-								<p className='text-gray-500'>
-									{property.company_name}
-								</p>
-							</div>
+							</Link>
 						))}
 				</div>
 
