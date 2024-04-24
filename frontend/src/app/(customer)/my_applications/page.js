@@ -3,6 +3,7 @@
 import SuiteMateLoader from "@/components/loader";
 import apiService from "@/controllers/apiService";
 import { useState, useEffect } from "react";
+import Link from 'next/link';
 
 const MyApplications = () => {
   const [applications, setApplications] = useState([]);
@@ -52,7 +53,7 @@ const MyApplications = () => {
                     className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}
                   >
                     <td className="border px-4 py-2">
-                      {application.apartment_no}
+                    <Link href={`/unit_details/${application.unit_id}`}>{application.apartment_no}</Link>
                     </td>
                     <td className="border px-4 py-2 ">
                       {application.property_name}
