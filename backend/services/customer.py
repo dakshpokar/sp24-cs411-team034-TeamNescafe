@@ -60,6 +60,27 @@ def submit_application():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@customer_service.route('/submit_preferences', methods=['POST'])
+def submit_preferences():
+    try:
+        headers = request.headers
+        token = headers['Authorization']
+        user_id = get_user_id(connection, token)
+        if check_agent_role(connection, user_id):
+            return jsonify({'error': "User is an Agent"}), 403
+
+        data = request.json
+        for key in data.keys():
+            query = (f"INSERT INTO userdetails (user_id, pref_id, value) "
+                    f"VALUES ({user_id}, {key}, '{data[key]}');")
+            run_update_query(connection, query)
+
+        result = {'success': True}
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @customer_service.route('/list_properties', methods=['GET'])
 def list_properties():
     try:
