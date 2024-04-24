@@ -71,9 +71,10 @@ def submit_preferences():
 
         data = request.json
         for key in data.keys():
-            query = (f"INSERT INTO userdetails (user_id, pref_id, value) "
-                    f"VALUES ({user_id}, {key}, '{data[key]}');")
-            run_update_query(connection, query)
+            if data[key] != '-':
+                query = (f"INSERT INTO userdetails (user_id, pref_id, value) "
+                        f"VALUES ({user_id}, {key}, '{data[key]}');")
+                run_update_query(connection, query)
 
         result = {'success': True}
         return jsonify(result)
