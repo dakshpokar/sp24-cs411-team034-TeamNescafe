@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import apiService from '@/controllers/apiService';
+import Link from 'next/link';
 
 export default function AgentDashboard() {
 	const [dashboardData, setDashboardData] = useState([]);
@@ -44,7 +45,7 @@ export default function AgentDashboard() {
 								}
 							>
 								<td className='border px-4 py-2'>
-									{item.apartment_num}
+								<Link href={`/unit/${item.unit_id}`}>{item.apartment_num}</Link>
 								</td>
 								<td className='border px-4 py-2 '>
 									{item.property_name}

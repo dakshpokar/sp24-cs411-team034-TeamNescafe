@@ -8,24 +8,27 @@ agent_service = Blueprint('agent_service', __name__, url_prefix='/agent')
 def get_unit_from_id():
     try:
         unit_id = request.args.get('unit_id')
-        query = f"SELECT u.apartment_no, u.bedrooms, u.bathrooms, u.price, u.availability, u.area , up.photo FROM unit u NATURAL JOIN unitphoto up where u.unit_id = {unit_id};"
+        query = f"SELECT * FROM unit where unit_id = {unit_id};"
         rows = run_query(connection, query)
+
+        query2 = (f"select * from unitphoto where unit_id = {unit_id};")
+        rows2 = run_query(connection, query2)
 
         results = []
         for row in rows:
             results.append({
-                'apartment_no': row[0],
-                'bedrooms': row[1],
-                'bathrooms': row[2],
-                'price': row[3],
-                'availability': row[4],
-                'area': row[5],
-                'photo': row[6],
-            })
-        return jsonify(results)
-
+                    'apartment_no': row[2],
+                    'bedrooms': row[3],
+                    'bathrooms': row[4],
+                    'price': row[5],
+                    'availability': row[6],
+                    'area': row[7],
+                    'photos':[row2[1] for row2 in rows2]
+                })
+        return jsonify(results[0])
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
     
 @agent_service.route('/update_application', methods=['POST'])
 def update_application():
@@ -73,7 +76,7 @@ def get_unit_app_count():
         company_id = run_query(connection, query)[0][0]
         print(company_id)
 
-        query = (f"SELECT u.apartment_no, "
+        query = (f"SELECT u.unit_id, p.property_id, u.apartment_no, "
                 f"p.name, "
                 f"COUNT(*) as app_count "
                 f"FROM unit u "
@@ -86,9 +89,11 @@ def get_unit_app_count():
         results = []
         for row in rows:
             results.append({
-                    'apartment_num': row[0],
-                    'property_name': row[1],
-                    'num_applications': row[2]
+                    'unit_id': row[0],
+                    'property_id': row[1],
+                    'apartment_num': row[2],
+                    'property_name': row[3],
+                    'num_applications': row[4]
                 })
         return jsonify(results)
     except Exception as e:
