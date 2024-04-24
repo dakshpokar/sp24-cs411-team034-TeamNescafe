@@ -54,6 +54,9 @@ const apiService = {
   propertyDetails: async (params) =>
     get("customer/get_property_from_id", true, params),
   addReview: async (data) => post("customer/add_review", data, true),
+  addPreferences: async (data) => post("customer/submit_preferences", data, true),
+  getApplications: async (data) => get("agent/get_applications_for_unit", true, data),
+  updateApplication: async (data) => post("agent/update_application", data, true)
 };
 
 export default apiService;

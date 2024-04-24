@@ -35,10 +35,17 @@ const UnitDetails = () => {
 		}
 	};
 
-	const { apartment_no, area, availability, bathrooms, bedrooms, photos, price } = unit;
+	const { apartment_no, area, availability, bathrooms, bedrooms, photos, price, property_name } = unit;
 	return (<div> {!unit && <div>Loading</div>}
 		{ unit && photos && 
-		(<div className="max-w-lg mx-auto p-4">
+		(
+		
+		<div className="max-w-lg mx-auto p-4">
+			<div className='sm:mx-auto sm:w-full sm:max-w-sm'>
+				<h2 className='mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900'>
+					{property_name}
+				</h2>
+			</div>
 		  <div className="mb-8">
 			<img
 			  src={photos[0]}

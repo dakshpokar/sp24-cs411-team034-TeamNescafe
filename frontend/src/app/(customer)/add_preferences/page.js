@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import apiService from '@/controllers/apiService';
 import { useRouter } from 'next/navigation';
 
-export default function SignUp() {
+export default function AddPreferences() {
 	const [email_id, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [first_name, setFirstName] = useState('');
@@ -28,9 +28,9 @@ export default function SignUp() {
 		};
 		e.preventDefault();
 		apiService
-			.signup(formData)
+			.addPreferences(formData)
 			.then((response) => {
-				toast.success('Signed up Successfully !');
+				toast.success('Preferences added Successfully !');
 				console.log(response);
 				push('/login');
 			})
@@ -44,7 +44,7 @@ export default function SignUp() {
 		<div className='flex flex-col justify-center items-center h-screen'>
 			<div className='sm:mx-auto sm:w-full sm:max-w-sm'>
 				<h2 className='mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900'>
-					Register your new account
+					Add your Preferences
 				</h2>
 			</div>
 			<form
