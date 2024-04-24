@@ -60,6 +60,27 @@ def submit_application():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@customer_service.route('/submit_preferences', methods=['POST'])
+def submit_preferences():
+    try:
+        headers = request.headers
+        token = headers['Authorization']
+        user_id = get_user_id(connection, token)
+        if check_agent_role(connection, user_id):
+            return jsonify({'error': "User is an Agent"}), 403
+
+        data = request.json
+        for key in data.keys():
+            query = (f"INSERT INTO userdetails (user_id, pref_id, value) "
+                    f"VALUES ({user_id}, {key}, '{data[key]}');")
+            run_update_query(connection, query)
+
+        result = {'success': True}
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @customer_service.route('/list_properties', methods=['GET'])
 def list_properties():
     try:
@@ -162,7 +183,7 @@ def my_applications():
     try:
         token = request.headers['Authorization']
         user_id = get_user_id(connection, token)
-        query = (f"SELECT u.apartment_no, p.name, u.price, a.status "
+        query = (f"SELECT u.apartment_no, p.name, u.price, a.status, u.unit_id "
                 f"FROM applications a "
                 f"JOIN unit u ON u.unit_id = a.unit_id "
                 f"JOIN property p ON p.property_id = u.property_id "
@@ -175,8 +196,28 @@ def my_applications():
                     'apartment_no': row[0],
                     'property_name': row[1],
                     'price': row[2],
-                    'status': row[3]
+                    'status': row[3],
+                    'unit_id':row[4]
                 })
+        return jsonify(results)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+@customer_service.route('/check_application_status', methods=['GET'])
+def check_application_status():
+    try:
+        token = request.headers['Authorization']
+        user_id = get_user_id(connection, token)
+        unit_id = request.args['unit_id']
+        
+        query = (f"SELECT a.status "
+                f"FROM applications a "
+                f"WHERE a.user_id = {user_id} and a.unit_id = {unit_id}; ")
+        rows = run_query(connection, query)
+        if not rows[0][0]:
+            results = {"status": "None"}
+        else:
+            results = {"status": rows[0][0]}
         return jsonify(results)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
