@@ -5,6 +5,7 @@ import apiService from "@/controllers/apiService";
 import Image from "next/image";
 import SuiteMateLoader from "@/components/loader";
 import Link from "next/link";
+import PropertyFilterModal from "./components/filter_modal";
 
 const Properties = () => {
   const [properties, setProperties] = useState([]);
@@ -13,6 +14,8 @@ const Properties = () => {
   const [propertiesPerPage] = useState(6);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [filterModalOpen, setFilterModalOpen] = useState(false);
+  const [filters, setFilters] = useState({});
 
   useEffect(() => {
     setIsLoading(true);
@@ -40,6 +43,20 @@ const Properties = () => {
     });
     setFilteredProperties(filtered);
   }, [search]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    apiService
+      .listProperties(filters)
+      .then((propertiesData) => {
+        setFilteredProperties(propertiesData);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching filtered properties data:", error);
+        setIsLoading(false);
+      });
+  }, [filters]);
 
   const pageNumbers = [];
   for (
@@ -159,12 +176,49 @@ const Properties = () => {
       <div className="flex items-center">
         <h1 className="font-semibold text-lg md:text-2xl">Properties</h1>
       </div>
-      <input
-        type="text"
-        placeholder="Search"
-        className="p-2 border rounded-md"
-        onChange={(e) => setSearch(e.target.value)}
-      />
+      <div className="flex items-center">
+        <input
+          type="text"
+          placeholder="Search"
+          className="p-2 border rounded-md mr-6"
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <button
+          type="button"
+          onClick={() => setFilterModalOpen(true)}
+          class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 inline-flex items-center"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-5 h-5 mr-2"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
+            />
+          </svg>
+          Filter
+        </button>
+      </div>
+      {/* Show Text with applied filters */}
+      {Object.keys(filters).length > 0 && (
+        <div className="flex items-center gap-2">
+          <p className="text-gray-500">Filters Applied:</p>
+          {Object.keys(filters).map(
+            (key) =>
+              filters[key] && (
+                <p key={key} className="text-gray-700">
+                  {key}: {filters[key]}
+                </p>
+              )
+          )}
+        </div>
+      )}
       {isLoading && <SuiteMateLoader />}
       {!isLoading && currentProperties.length === 0 && (
         <p>No properties found</p>
@@ -225,6 +279,19 @@ const Properties = () => {
           </div>
         </div>
       )}
+      <PropertyFilterModal
+        open={filterModalOpen}
+        filters={filters}
+        setOpen={() => {
+          setFilterModalOpen(!filterModalOpen);
+        }}
+        applyFilters={(filters) => {
+          setFilters(filters);
+        }}
+        resetFilters={() => {
+          setFilters({});
+        }}
+      />
     </main>
   );
 };
