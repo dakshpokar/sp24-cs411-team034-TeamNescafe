@@ -85,34 +85,34 @@ def submit_preferences():
 def list_properties():
     try:
         data = request.args
-        bedrooms = data.get('bedrooms',-1)
-        bathrooms = data.get('bathrooms',-1)
-        pricemin = data.get('pricemin',-1)
-        pricemax = data.get('pricemax',-1)
-        areamin = data.get('areamin',-1)
-        areamax = data.get('areamax',-1)
-        pincode = data.get('pincode',-1)
-        propertyName = data.get('propertyName',-1)
-        companyName = data.get('companyName',-1)
-        query = ("select distinct p.property_id, p.name, c.name, p.address, p.pincode from property p JOIN company c ON p.company_id = c.company_id JOIN unit u ON u.property_id = p.property_id LIMIT 50")
+        bedrooms = sanitize_input(data.get('bedrooms'))
+        bathrooms = sanitize_input(data.get('bathrooms'))
+        pricemin = sanitize_input(data.get('pricemin'))
+        pricemax = sanitize_input(data.get('pricemax'))
+        areamin = sanitize_input(data.get('areamin',))
+        areamax = sanitize_input(data.get('areamax'))
+        pincode = sanitize_input(data.get('pincode'))
+        propertyName = sanitize_input(data.get('propertyName'))
+        companyName = sanitize_input(data.get('companyName'))
+        query = ("select distinct p.property_id, p.name, c.name, p.address, p.pincode from property p JOIN company c ON p.company_id = c.company_id JOIN unit u ON u.property_id = p.property_id")
         whereParts = []
-        if bedrooms != -1:
+        if bedrooms:
             whereParts.append(f"u.bedrooms={bedrooms}")
-        if bathrooms != -1:
+        if bathrooms:
             whereParts.append(f"u.bathrooms={bathrooms}")
-        if areamin != -1:
+        if areamin:
             whereParts.append(f"u.area>={areamin}")
-        if areamax != -1:
+        if areamax:
             whereParts.append(f"u.area>={areamax}")
-        if pricemin != -1:
+        if pricemin :
             whereParts.append(f"u.price>={pricemin}")
-        if pricemax != -1:
+        if pricemax:
             whereParts.append(f"u.price<={pricemax}")
-        if pincode != -1:
+        if pincode:
             whereParts.append(f"p.pincode={pincode}")
-        if propertyName != -1:
+        if propertyName:
             whereParts.append(f"p.name LIKE '%{propertyName}%'")
-        if companyName != -1:
+        if companyName:
             whereParts.append(f"c.name LIKE '%{companyName}%'")
         if len(whereParts)>0:
             query += " WHERE "
@@ -135,6 +135,7 @@ def list_properties():
                 })
         return jsonify(results)
     except Exception as e:
+        print(e)
         return jsonify({'error': str(e)}), 500
 
 @customer_service.route('/get_property_from_id', methods=['GET'])
@@ -243,5 +244,31 @@ def get_roommates():
                 'similarity_ratio': row[3]
             })
         return jsonify(results)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+@customer_service.route('/add_review', methods=['POST'])
+def add_review():
+    try:
+        headers = request.headers
+        token = headers['Authorization']
+        user_id = get_user_id(connection, token)
+        if check_agent_role(connection, user_id):
+            return jsonify({'error': "User is an Agent"}), 403
+
+        data = request.json
+        property_id = data.get('property_id')
+        comment = data.get('comment')
+        rating = data.get('rating')
+        created_at = datetime.now().strftime('%Y-%m-%d')
+        success = True
+
+        query = (f"INSERT INTO reviews (user_id, property_id, created_at, comment, rating) "
+                f"VALUES ({user_id}, {property_id}, '{created_at}', '{comment}', '{rating}');")
+        if not run_update_query(connection, query):
+            success = False
+            return jsonify({'success': success}), 409
+        result = {'success': success}
+        return jsonify(result)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
