@@ -230,7 +230,7 @@ def get_roommates():
         token = request.headers['Authorization']
         user_id = get_user_id(connection, token)
         query = (
-            f"SELECT u.user_id,u.first_name,u.last_name,((SELECT COUNT(*) FROM userdetails ud WHERE ud.user_id = u.user_id AND "
+            f"SELECT u.user_id,u.first_name,u.last_name,u.email_id,((SELECT COUNT(*) FROM userdetails ud WHERE ud.user_id = u.user_id AND "
             f"ud.value IN (SELECT value FROM userdetails WHERE user_id = {user_id} AND ud.pref_id = pref_id)) / "
             f"(SELECT COUNT(*) FROM userdetails WHERE user_id = {user_id})) AS similarity_score "
             f"FROM user u JOIN userdetails ud ON u.user_id = ud.user_id WHERE u.user_id != {user_id} GROUP BY u.user_id "
@@ -242,7 +242,8 @@ def get_roommates():
                 'user_id': row[0],
                 'first_name': row[1],
                 'last_name': row[2],
-                'similarity_ratio': row[3]
+                'email_id': row[3],
+                'similarity_ratio': row[4]
             })
         return jsonify(results)
     except Exception as e:
