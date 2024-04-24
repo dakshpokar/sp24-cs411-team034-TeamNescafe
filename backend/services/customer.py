@@ -136,7 +136,48 @@ def list_properties():
         return jsonify(results)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
+
+@customer_service.route('/get_property_from_id', methods=['GET'])
+def get_property_from_id():
+    try:
+        property_id = request.args.get('property_id')
+        query = f"SELECT p.name, p.address, p.latitude, p.longitude, c.name, p.pincode FROM property as p join company as c on p.company_id=c.company_id where p.property_id = {property_id};"
+        rows = run_query(connection, query)
+
+        query2 = (f"select * from propertyphoto where property_id = {property_id};")
+        rows2 = run_query(connection, query2)
+
+        query3 = f"SELECT u.first_name, u.last_name, r.created_at, r.comment, r.rating FROM reviews as r join user as u on r.user_id=u.user_id where r.property_id = {property_id};"
+        rows3 = run_query(connection, query3)
+
+        reviews = []
+        avgRating = 0
+        for row in rows3:
+            avgRating += int(row[4])
+            reviews.append({
+                    'user_name': row[0] + ' ' + row[1],
+                    'created_at': row[2],
+                    'comment': row[3],
+                    'rating': row[4]
+                })
+        avgRating /= len(reviews)
+        results = []
+        for row in rows:
+            results.append({
+                    'name': row[0],
+                    'address': row[1],
+                    'latitude': row[2],
+                    'longitude': row[3],
+                    'company_name': row[4],
+                    'pincode': row[5],
+                    'photos':[row2[1] for row2 in rows2],
+                    'avgRating': avgRating,
+                    'reviews': reviews
+                })
+        return jsonify(results[0])
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @customer_service.route('/my_applications', methods=['GET'])
 def my_applications():
     try:
