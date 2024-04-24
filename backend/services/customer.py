@@ -245,3 +245,29 @@ def get_roommates():
         return jsonify(results)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+@customer_service.route('/add_review', methods=['POST'])
+def add_review():
+    try:
+        headers = request.headers
+        token = headers['Authorization']
+        user_id = get_user_id(connection, token)
+        if check_agent_role(connection, user_id):
+            return jsonify({'error': "User is an Agent"}), 403
+
+        data = request.json
+        property_id = data.get('property_id')
+        comment = data.get('comment')
+        rating = data.get('rating')
+        created_at = datetime.now().strftime('%Y-%m-%d')
+        success = True
+
+        query = (f"INSERT INTO reviews (user_id, property_id, created_at, comment, rating) "
+                f"VALUES ({user_id}, {property_id}, '{created_at}', '{comment}', '{rating}');")
+        if not run_update_query(connection, query):
+            success = False
+            return jsonify({'success': success}), 409
+        result = {'success': success}
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

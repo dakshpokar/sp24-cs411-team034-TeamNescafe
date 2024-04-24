@@ -53,6 +53,7 @@ const apiService = {
     get("customer/check_application_status", true, params),
   propertyDetails: async (params) =>
     get("customer/get_property_from_id", true, params),
+  addReview: async (data) => post("customer/add_review", data, true),
 };
 
 export default apiService;
