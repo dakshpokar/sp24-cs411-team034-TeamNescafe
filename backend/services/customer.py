@@ -126,6 +126,20 @@ def get_property_from_id():
         query2 = (f"select * from propertyphoto where property_id = {property_id};")
         rows2 = run_query(connection, query2)
 
+        query3 = f"SELECT u.first_name, u.last_name, r.created_at, r.comment, r.rating FROM reviews as r join user as u on r.user_id=u.user_id where r.property_id = {property_id};"
+        rows3 = run_query(connection, query3)
+
+        reviews = []
+        avgRating = 0
+        for row in rows3:
+            avgRating += int(row[4])
+            reviews.append({
+                    'user_name': row[0] + ' ' + row[1],
+                    'created_at': row[2],
+                    'comment': row[3],
+                    'rating': row[4]
+                })
+        avgRating /= len(reviews)
         results = []
         for row in rows:
             results.append({
@@ -135,7 +149,9 @@ def get_property_from_id():
                     'longitude': row[3],
                     'company_name': row[4],
                     'pincode': row[5],
-                    'photos':[row2[1] for row2 in rows2]
+                    'photos':[row2[1] for row2 in rows2],
+                    'avgRating': avgRating,
+                    'reviews': reviews
                 })
         return jsonify(results[0])
     except Exception as e:
@@ -162,24 +178,6 @@ def my_applications():
                     'status': row[3]
                 })
         return jsonify(results)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@customer_service.route('/get_property_reviews', methods=['GET'])
-def get_property_reviews():
-    try:
-        property_id = request.args.get('property_id')
-        query = f"SELECT u.first_name, u.last_name, r.created_at, r.comment, r.rating FROM reviews as r join user as u on r.user_id=u.user_id where r.property_id = {property_id};"
-        rows = run_query(connection, query)
-
-        results = []
-        results.append({
-                'user_name': [row[0] + ' ' + row[1] for row in rows],
-                'created_at': [row[2] for row in rows],
-                'comment': [row[3] for row in rows],
-                'rating': [row[4] for row in rows]
-            })
-        return jsonify(results[0])
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
