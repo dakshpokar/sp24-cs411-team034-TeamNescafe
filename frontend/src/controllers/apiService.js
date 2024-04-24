@@ -44,7 +44,8 @@ const apiService = {
   signup: async (data) => post("auth/sign_up", data),
   submitApplication: async (data) =>
     post("customer/submit_application", data, true),
-  listProperties: async () => get("customer/list_properties"),
+  listProperties: async (params) =>
+    get("customer/list_properties", true, params),
   myApplications: async () => get("customer/my_applications", true),
   agentDashboard: async () => get("agent/get_unit_app_count", true),
   getRoommates: async () => get("customer/get_roommates", true),
