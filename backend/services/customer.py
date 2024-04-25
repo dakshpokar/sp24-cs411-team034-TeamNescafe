@@ -152,17 +152,29 @@ def get_property_from_id():
         query3 = f"SELECT u.first_name, u.last_name, r.created_at, r.comment, r.rating FROM reviews as r join user as u on r.user_id=u.user_id where r.property_id = {property_id};"
         rows3 = run_query(connection, query3)
 
+        query4 = f"SELECT unit_id, apartment_no from unit where property_id={property_id};"
+        rows4 = run_query(connection, query4)
+
         reviews = []
         avgRating = 0
-        for row in rows3:
-            avgRating += int(row[4])
-            reviews.append({
-                    'user_name': row[0] + ' ' + row[1],
-                    'created_at': row[2],
-                    'comment': row[3],
-                    'rating': row[4]
-                })
-        avgRating /= len(reviews)
+        if len(reviews)>0:
+            for row in rows3:
+                avgRating += int(row[4])
+                reviews.append({
+                        'user_name': row[0] + ' ' + row[1],
+                        'created_at': row[2],
+                        'comment': row[3],
+                        'rating': row[4]
+                    })
+            avgRating /= len(reviews)
+
+        units = []
+        for row in rows4:
+            units.append({
+                'unit_id': row[0],
+                'apartment_no': row[1]
+            })
+
         results = []
         for row in rows:
             results.append({
@@ -174,7 +186,8 @@ def get_property_from_id():
                     'pincode': row[5],
                     'photos':[row2[1] for row2 in rows2],
                     'avgRating': avgRating,
-                    'reviews': reviews
+                    'reviews': reviews,
+                    'units': units
                 })
         return jsonify(results[0])
     except Exception as e:
@@ -185,7 +198,7 @@ def my_applications():
     try:
         token = request.headers['Authorization']
         user_id = get_user_id(connection, token)
-        query = (f"SELECT u.apartment_no, p.name, u.price, a.status, u.unit_id "
+        query = (f"SELECT u.apartment_no, p.name, u.price, a.status, u.unit_id, u.property_id "
                 f"FROM applications a "
                 f"JOIN unit u ON u.unit_id = a.unit_id "
                 f"JOIN property p ON p.property_id = u.property_id "
@@ -199,7 +212,8 @@ def my_applications():
                     'property_name': row[1],
                     'price': row[2],
                     'status': row[3],
-                    'unit_id':row[4]
+                    'unit_id':row[4],
+                    'property_id':row[5]
                 })
         return jsonify(results)
     except Exception as e:
