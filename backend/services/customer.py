@@ -71,9 +71,10 @@ def submit_preferences():
 
         data = request.json
         for key in data.keys():
-            query = (f"INSERT INTO userdetails (user_id, pref_id, value) "
-                    f"VALUES ({user_id}, {key}, '{data[key]}');")
-            run_update_query(connection, query)
+            if data[key] != '-':
+                query = (f"INSERT INTO userdetails (user_id, pref_id, value) "
+                        f"VALUES ({user_id}, {key}, '{data[key]}');")
+                run_update_query(connection, query)
 
         result = {'success': True}
         return jsonify(result)
@@ -85,34 +86,34 @@ def submit_preferences():
 def list_properties():
     try:
         data = request.args
-        bedrooms = data.get('bedrooms',-1)
-        bathrooms = data.get('bathrooms',-1)
-        pricemin = data.get('pricemin',-1)
-        pricemax = data.get('pricemax',-1)
-        areamin = data.get('areamin',-1)
-        areamax = data.get('areamax',-1)
-        pincode = data.get('pincode',-1)
-        propertyName = data.get('propertyName',-1)
-        companyName = data.get('companyName',-1)
-        query = ("select distinct p.property_id, p.name, c.name, p.address, p.pincode from property p JOIN company c ON p.company_id = c.company_id JOIN unit u ON u.property_id = p.property_id LIMIT 50")
+        bedrooms = sanitize_input(data.get('bedrooms'))
+        bathrooms = sanitize_input(data.get('bathrooms'))
+        pricemin = sanitize_input(data.get('pricemin'))
+        pricemax = sanitize_input(data.get('pricemax'))
+        areamin = sanitize_input(data.get('areamin',))
+        areamax = sanitize_input(data.get('areamax'))
+        pincode = sanitize_input(data.get('pincode'))
+        propertyName = sanitize_input(data.get('propertyName'))
+        companyName = sanitize_input(data.get('companyName'))
+        query = ("select distinct p.property_id, p.name, c.name, p.address, p.pincode from property p JOIN company c ON p.company_id = c.company_id JOIN unit u ON u.property_id = p.property_id")
         whereParts = []
-        if bedrooms != -1:
+        if bedrooms:
             whereParts.append(f"u.bedrooms={bedrooms}")
-        if bathrooms != -1:
+        if bathrooms:
             whereParts.append(f"u.bathrooms={bathrooms}")
-        if areamin != -1:
+        if areamin:
             whereParts.append(f"u.area>={areamin}")
-        if areamax != -1:
+        if areamax:
             whereParts.append(f"u.area>={areamax}")
-        if pricemin != -1:
+        if pricemin :
             whereParts.append(f"u.price>={pricemin}")
-        if pricemax != -1:
+        if pricemax:
             whereParts.append(f"u.price<={pricemax}")
-        if pincode != -1:
+        if pincode:
             whereParts.append(f"p.pincode={pincode}")
-        if propertyName != -1:
+        if propertyName:
             whereParts.append(f"p.name LIKE '%{propertyName}%'")
-        if companyName != -1:
+        if companyName:
             whereParts.append(f"c.name LIKE '%{companyName}%'")
         if len(whereParts)>0:
             query += " WHERE "
@@ -135,6 +136,7 @@ def list_properties():
                 })
         return jsonify(results)
     except Exception as e:
+        print(e)
         return jsonify({'error': str(e)}), 500
 
 @customer_service.route('/get_property_from_id', methods=['GET'])
@@ -242,7 +244,7 @@ def get_roommates():
         token = request.headers['Authorization']
         user_id = get_user_id(connection, token)
         query = (
-            f"SELECT u.user_id,u.first_name,u.last_name,((SELECT COUNT(*) FROM userdetails ud WHERE ud.user_id = u.user_id AND "
+            f"SELECT u.user_id,u.first_name,u.last_name,u.email_id,((SELECT COUNT(*) FROM userdetails ud WHERE ud.user_id = u.user_id AND "
             f"ud.value IN (SELECT value FROM userdetails WHERE user_id = {user_id} AND ud.pref_id = pref_id)) / "
             f"(SELECT COUNT(*) FROM userdetails WHERE user_id = {user_id})) AS similarity_score "
             f"FROM user u JOIN userdetails ud ON u.user_id = ud.user_id WHERE u.user_id != {user_id} GROUP BY u.user_id "
@@ -254,7 +256,8 @@ def get_roommates():
                 'user_id': row[0],
                 'first_name': row[1],
                 'last_name': row[2],
-                'similarity_ratio': row[3]
+                'email_id': row[3],
+                'similarity_ratio': row[4]
             })
         return jsonify(results)
     except Exception as e:
