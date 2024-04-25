@@ -155,15 +155,16 @@ def get_property_from_id():
 
         reviews = []
         avgRating = 0
-        for row in rows3:
-            avgRating += int(row[4])
-            reviews.append({
-                    'user_name': row[0] + ' ' + row[1],
-                    'created_at': row[2],
-                    'comment': row[3],
-                    'rating': row[4]
-                })
-        avgRating /= len(reviews)
+        if len(reviews)>0:
+            for row in rows3:
+                avgRating += int(row[4])
+                reviews.append({
+                        'user_name': row[0] + ' ' + row[1],
+                        'created_at': row[2],
+                        'comment': row[3],
+                        'rating': row[4]
+                    })
+            avgRating /= len(reviews)
 
         units = []
         for row in rows4:
@@ -195,7 +196,7 @@ def my_applications():
     try:
         token = request.headers['Authorization']
         user_id = get_user_id(connection, token)
-        query = (f"SELECT u.apartment_no, p.name, u.price, a.status, u.unit_id "
+        query = (f"SELECT u.apartment_no, p.name, u.price, a.status, u.unit_id, u.property_id "
                 f"FROM applications a "
                 f"JOIN unit u ON u.unit_id = a.unit_id "
                 f"JOIN property p ON p.property_id = u.property_id "
@@ -209,7 +210,8 @@ def my_applications():
                     'property_name': row[1],
                     'price': row[2],
                     'status': row[3],
-                    'unit_id':row[4]
+                    'unit_id':row[4],
+                    'property_id':row[5]
                 })
         return jsonify(results)
     except Exception as e:
