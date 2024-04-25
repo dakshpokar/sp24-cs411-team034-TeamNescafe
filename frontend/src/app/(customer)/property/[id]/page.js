@@ -80,7 +80,7 @@ const PropertyDetails = () => {
 		  <div className="w-full border-collapse rounded-lg shadow-md my-4 py-4">
 			<h3 className="font-semibold p-2">Units:</h3>
 			{units.map((unit, index) => (
-				<Link href={`/unit/${unit.unit_id}`}>
+				<Link href={`/unit_details/${unit.unit_id}`}>
 					<p className='px-4 py-1'>{unit.apartment_no}</p>
 				</Link>
 			))}
