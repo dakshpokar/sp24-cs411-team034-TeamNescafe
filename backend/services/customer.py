@@ -150,6 +150,9 @@ def get_property_from_id():
         query3 = f"SELECT u.first_name, u.last_name, r.created_at, r.comment, r.rating FROM reviews as r join user as u on r.user_id=u.user_id where r.property_id = {property_id};"
         rows3 = run_query(connection, query3)
 
+        query4 = f"SELECT unit_id, apartment_no from unit where property_id={property_id};"
+        rows4 = run_query(connection, query4)
+
         reviews = []
         avgRating = 0
         for row in rows3:
@@ -161,6 +164,14 @@ def get_property_from_id():
                     'rating': row[4]
                 })
         avgRating /= len(reviews)
+
+        units = []
+        for row in rows4:
+            units.append({
+                'unit_id': row[0],
+                'apartment_no': row[1]
+            })
+
         results = []
         for row in rows:
             results.append({
@@ -172,7 +183,8 @@ def get_property_from_id():
                     'pincode': row[5],
                     'photos':[row2[1] for row2 in rows2],
                     'avgRating': avgRating,
-                    'reviews': reviews
+                    'reviews': reviews,
+                    'units': units
                 })
         return jsonify(results[0])
     except Exception as e:
