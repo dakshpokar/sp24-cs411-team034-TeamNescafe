@@ -157,7 +157,7 @@ def get_property_from_id():
 
         reviews = []
         avgRating = 0
-        if len(reviews)>0:
+        if len(rows3)>0:
             for row in rows3:
                 avgRating += int(row[4])
                 reviews.append({

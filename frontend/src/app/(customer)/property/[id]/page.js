@@ -65,7 +65,7 @@ const PropertyDetails = () => {
 			  </tr>
 			  <tr>
 				<td className="px-4 py-2 font-semibold">Average Rating:</td>
-				<td className="px-4 py-2">{avgRating}/5</td>
+				<td className="px-4 py-2">{avgRating.toFixed(2)}/5</td>
 			  </tr>
 			  <tr>
 				<td className="px-4 py-2 font-semibold">Address:</td>
