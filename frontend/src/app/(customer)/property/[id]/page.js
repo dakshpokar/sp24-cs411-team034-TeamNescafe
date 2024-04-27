@@ -4,6 +4,7 @@ import apiService from '@/controllers/apiService';
 import { useParams } from 'next/navigation';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
+import Link from 'next/link';
 
 const PropertyDetails = () => {
 	const params = useParams()
@@ -40,7 +41,7 @@ const PropertyDetails = () => {
 		});
 	}, []);
 
-	const { name, address, latitude, longitude, company_name, pincode, photos, avgRating, reviews } = property;
+	const { name, address, latitude, longitude, company_name, pincode, photos, avgRating, reviews, units } = property;
 
 	return (<div> {!property && <div>Loading</div>}
 		{ property && photos && 
@@ -76,6 +77,14 @@ const PropertyDetails = () => {
 			  </tr>
 			</tbody>
 		  </table>
+		  <div className="w-full border-collapse rounded-lg shadow-md my-4 py-4">
+			<h3 className="font-semibold p-2">Units:</h3>
+			{units.map((unit, index) => (
+				<Link href={`/unit_details/${unit.unit_id}`}>
+					<p className='px-4 py-1'>{unit.apartment_no}</p>
+				</Link>
+			))}
+		  </div>
 		  <div className="my-4">
             <h3 className="font-semibold mb-2">Reviews</h3>
             {reviews.map((review, index) => (

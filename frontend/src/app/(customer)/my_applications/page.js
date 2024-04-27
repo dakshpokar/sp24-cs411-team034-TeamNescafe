@@ -55,9 +55,9 @@ const MyApplications = () => {
                     <td className="border px-4 py-2">
                     <Link href={`/unit_details/${application.unit_id}`}>{application.apartment_no}</Link>
                     </td>
-                    <td className="border px-4 py-2 ">
-                      {application.property_name}
-                    </td>
+                      <td className="border px-4 py-2 ">
+                      <Link href={`/property/${application.property_id}`}>{application.property_name}</Link>
+                      </td>
                     <td className="border px-4 py-2">{application.price}</td>
                     <td className="border px-4 py-2">
                       {application.status === "approved" ? (

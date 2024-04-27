@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from utils import *
-from db import connection
+from db import connection, connect_to_database
 
 agent_service = Blueprint('agent_service', __name__, url_prefix='/agent')
 
@@ -8,7 +8,7 @@ agent_service = Blueprint('agent_service', __name__, url_prefix='/agent')
 def get_unit_from_id():
     try:
         unit_id = request.args.get('unit_id')
-        query = f"SELECT * FROM unit where unit_id = {unit_id};"
+        query = f"SELECT * FROM unit u NATURAL JOIN property p where u.unit_id = {unit_id};"
         rows = run_query(connection, query)
 
         query2 = (f"select * from unitphoto where unit_id = {unit_id};")
@@ -17,15 +17,38 @@ def get_unit_from_id():
         results = []
         for row in rows:
             results.append({
+                    'unit_id': row[1],
                     'apartment_no': row[2],
                     'bedrooms': row[3],
                     'bathrooms': row[4],
                     'price': row[5],
                     'availability': row[6],
                     'area': row[7],
+                    'property_name':row[8],
                     'photos':[row2[1] for row2 in rows2]
                 })
         return jsonify(results[0])
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@agent_service.route('/get_applications_for_unit', methods=['GET'])
+def get_applications_for_unit():
+    try:
+        unit_id = request.args['unit_id']
+        query = f"SELECT * FROM applications natural join user natural join unit where unit_id = {unit_id};"
+        conn = connect_to_database()
+        rows = run_query(conn, query)
+
+        results = []
+        for row in rows:
+            results.append({
+                    'user_id': row[1],
+                    'Name': row[7]+" "+row[8],
+                    'email_id': row[4],
+                    'unit_id': row[0],
+                    'status': row[3]
+                })
+        return jsonify(results)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -42,12 +65,14 @@ def update_application():
 
         if check_agent_role(connection, agent_id):
             if status=="approved":
-                query = (f"UPDATE applications set status='{status}' where user_id = {user_id} and unit_id = {unit_id};"
-                        f"UPDATE unit set availability=false where unit_id={unit_id};")
-                if not run_update_query(connection, query):
+                query1 = (f"UPDATE applications set status='{status}' where user_id = {user_id} and unit_id = {unit_id}; ")
+                query2 = (f"UPDATE unit set availability=0 where unit_id={unit_id};")
+                if not run_update_query(connection, query1):
                     success = False
                     return jsonify({'success': success}), 409
-
+                if not run_update_query(connection, query2):
+                    success = False
+                    return jsonify({'success': success}), 409
             elif status=="rejected":
                 query = f"UPDATE applications set status='{status}' where user_id = {user_id} and unit_id = {unit_id};"
                 if not run_update_query(connection, query):

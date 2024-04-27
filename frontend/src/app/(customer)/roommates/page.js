@@ -56,6 +56,7 @@ const Roommates = () => {
               <thead>
                 <tr>
                   <th className="px-4 py-2">Name</th>
+                  <th className="px-4 py-2">Email ID</th>
                   <th className="px-4 py-2">Similarity</th>
                 </tr>
               </thead>
@@ -67,6 +68,9 @@ const Roommates = () => {
                   >
                     <td className="border px-4 py-2">
                       {roommate.first_name} {roommate.last_name}
+                    </td>
+                    <td className="border px-4 py-2">
+                      {roommate.email_id}
                     </td>
                     <td className="border px-4 py-2 ">
                       {Math.round(roommate.similarity_ratio * 100)}%

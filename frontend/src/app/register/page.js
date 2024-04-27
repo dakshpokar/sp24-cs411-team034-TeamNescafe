@@ -30,13 +30,13 @@ export default function SignUp() {
 		apiService
 			.signup(formData)
 			.then((response) => {
-				toast.success('Logged in Successfully !');
+				toast.success('Signed up Successfully !');
 				console.log(response);
 				push('/login');
 			})
 			.catch((error) => {
 				console.log(error);
-				toast.error('Could not Login!');
+				toast.error('Could not Sign Up!');
 			});
 	};
 

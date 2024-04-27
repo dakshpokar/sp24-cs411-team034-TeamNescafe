@@ -72,6 +72,12 @@ def sign_up():
                     f"VALUES ('{email_id}', '{password_hash}', '{role_type}', '{first_name}', '{last_name}', '{phone_number}', '{gender}', '{dob}');")
             if not run_update_query(connection, query):
                 return jsonify({'success': False, 'message': "Failed to sign up"}), 409
+            query = (f"select user_id from user where email_id = '{email_id}';")
+            user_id = run_query(connection, query)[0][0]
+            query = (f"INSERT INTO userdetails (user_id, pref_id, value) "
+                        f"VALUES ({user_id}, 1, '{gender}');")
+            if not run_update_query(connection, query):
+                return jsonify({'success': False, 'message': "Failed to sign up"}), 409
         else:
             return jsonify({'success': False, 'message': "Email Id is already in use!"}), 409
 
