@@ -104,6 +104,7 @@ const PropertyFilterModal = ({
 													Property Filters
 												</Dialog.Title>
 											</div>
+
 											<div className='relative mt-6 flex-1 px-4 sm:px-6'>
 												<div>
 													<input
