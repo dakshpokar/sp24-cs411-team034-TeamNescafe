@@ -39,31 +39,27 @@ const Properties = () => {
 	}, []);
 
 	useEffect(() => {
-		let filtered = properties.filter((property) => {
-			return (
-				property.property_name
-					.toLowerCase()
-					.includes(search.toLowerCase()) ||
-				property.address
-					.toLowerCase()
-					.includes(search.toLowerCase()) ||
-				property.pincode
-					.toString()
-					.includes(search.toLowerCase()) ||
-				property.company_name
-					.toLowerCase()
-					.includes(search.toLowerCase())
-			);
-		});
-		setFilteredProperties(filtered);
-	}, [search]);
-
-	useEffect(() => {
 		setIsLoading(true);
 		apiService
 			.listProperties(filters)
 			.then((propertiesData) => {
-				setFilteredProperties(propertiesData);
+				let filtered = propertiesData.filter((property) => {
+					return (
+						property.property_name
+							.toLowerCase()
+							.includes(search.toLowerCase()) ||
+						property.address
+							.toLowerCase()
+							.includes(search.toLowerCase()) ||
+						property.pincode
+							.toString()
+							.includes(search.toLowerCase()) ||
+						property.company_name
+							.toLowerCase()
+							.includes(search.toLowerCase())
+					);
+				});
+				setFilteredProperties(filtered);
 				setIsLoading(false);
 			})
 			.catch((error) => {
@@ -73,7 +69,7 @@ const Properties = () => {
 				);
 				setIsLoading(false);
 			});
-	}, [filters]);
+	}, [filters, search]);
 
 	const pageNumbers = [];
 	for (
