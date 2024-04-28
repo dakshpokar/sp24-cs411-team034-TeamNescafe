@@ -45,10 +45,18 @@ export default function AgentDashboard() {
 								}
 							>
 								<td className='border px-4 py-2'>
-								<Link href={`/unit/${item.unit_id}`}>{item.apartment_num}</Link>
+									<Link
+										href={`/unit/${item.unit_id}`}
+									>
+										{item.apartment_num}
+									</Link>
 								</td>
 								<td className='border px-4 py-2 '>
-								<Link href={`/property/${item.property_id}`}>{item.property_name}</Link>
+									<Link
+										href={`/property/${item.property_id}`}
+									>
+										{item.property_name}
+									</Link>
 								</td>
 								<td className='border px-4 py-2'>
 									{item.num_applications}
