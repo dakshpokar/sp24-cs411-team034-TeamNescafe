@@ -33,6 +33,9 @@ export default function CustomerLayout({ children }) {
 									<NavItem where='/my_applications'>
 										My Applications
 									</NavItem>
+									<NavItem where='/analytics-customer'>
+										Analytics
+									</NavItem>
 								</nav>
 							</div>
 							<div className='pb-4'>
