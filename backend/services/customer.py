@@ -376,9 +376,20 @@ def advanced_properties_filter():
                     cursor.callproc('complex_stored_procedure_for_filtering', [flag, areamin, areamax, pricemin, pricemax])
                     results = []
                     for result in cursor.stored_results():
+
                         results.append(result.fetchall())
-                    print(results)
-                    return jsonify(results)
+                    sub = results[0]
+                    final_result_pro_max = []
+                    for i in sub:
+                        final_result_pro_max.append({
+                            'property_id': i[0],
+                            'property_name': i[1],
+                            'pincode': i[2],
+                            'avg_rating': float(i[3]),
+                            'num_reviews': i[4]
+                        })
+                    print(final_result_pro_max)
+                    return jsonify({'data': final_result_pro_max})
                 finally:
                     conn.close()
             else:
