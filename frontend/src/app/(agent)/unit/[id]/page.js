@@ -44,6 +44,8 @@ const UnitDetails = () => {
 		property_name,
 	} = unit;
 
+	console.log(availability);
+
 	const onAccept = (userId, unitId) => {
 		toast.success('Application Accepted !');
 		console.log(userId, unitId);
@@ -210,12 +212,14 @@ const UnitDetails = () => {
 												<td className='px-4 py-2  text-center  flex flex-col gap-2  h-full'>
 													<button
 														disabled={
+															!availability ||
 															application.status ===
-															'approved'
+																'approved'
 														}
 														className={` text-white rounded-lg px-3 py-1  ${
+															!availability ||
 															application.status ===
-															'approved'
+																'approved'
 																? 'cursor-not-allowed bg-green-300'
 																: 'bg-green-500 hover:bg-green-600'
 														}`}

@@ -44,21 +44,21 @@ export default function AgentDashboard() {
 										: 'bg-white'
 								}
 							>
-								<td className='border px-4 py-2'>
+								<td className='border px-4 py-2 text-center underline underline-offset-4'>
 									<Link
 										href={`/unit/${item.unit_id}`}
 									>
 										{item.apartment_num}
 									</Link>
 								</td>
-								<td className='border px-4 py-2 '>
-									<Link
+								<td className='border px-4 py-2 text-center'>
+									{/* <Link
 										href={`/property/${item.property_id}`}
-									>
-										{item.property_name}
-									</Link>
+									> */}
+									{item.property_name}
+									{/* </Link> */}
 								</td>
-								<td className='border px-4 py-2'>
+								<td className='border px-4 py-2 text-center'>
 									{item.num_applications}
 								</td>
 							</tr>
