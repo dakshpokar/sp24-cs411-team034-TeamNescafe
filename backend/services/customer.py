@@ -142,7 +142,7 @@ def list_properties():
                 if len(whereParts) > 0:
                     query += " WHERE "
                     query += " and ".join(whereParts)
-                query += ';'
+                query += ' order by p.name;'
                 rows = run_query(conn, query)
 
                 query2 = ("select * from propertyphoto;")
