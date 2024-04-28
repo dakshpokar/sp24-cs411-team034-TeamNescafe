@@ -8,16 +8,16 @@ export default function CustomerLayout({ children }) {
 	return (
 		<html lang='en' className='h-full bg-gray-50'>
 			<body>
-				<div className='grid min-h-screen w-full lg:grid-cols-[280px_1fr]'>
+				<div className='fixed inset-0 grid min-h-screen w-full lg:grid-cols-[280px_1fr]'>
 					<div className='hidden border-r bg-gray-100/40 lg:block dark:bg-gray-800/40'>
-						<div className='flex h-full max-h-screen flex-col gap-2'>
+						<div className='flex h-full max-h-screen flex-col'>
 							<div className='flex h-[60px] items-center border-b px-5'>
 								<Link
 									className='flex items-center gap-2 font-semibold'
 									href='/'
 								>
 									{/* <Logo /> */}
-									<span className=''>
+									<span className='font-sans font-bold subpixel-antialiased text-2xl  '>
 										Suitemate
 									</span>
 								</Link>
@@ -33,19 +33,26 @@ export default function CustomerLayout({ children }) {
 									<NavItem where='/my_applications'>
 										My Applications
 									</NavItem>
+									<NavItem where='/analytics-customer'>
+										Analytics
+									</NavItem>
+								</nav>
+							</div>
+							<div className='pb-4'>
+								<nav className='grid items-start px-4 text-sm font-medium'>
+									<NavItem where='/logout'>
+										Logout
+									</NavItem>
 								</nav>
 							</div>
 						</div>
 					</div>
-					<div className='flex flex-col'>
+					<div className='flex flex-col overflow-auto'>
 						{/* <header className='flex h-14 lg:h-[60px] items-center gap-4 border-b bg-gray-100/40 px-6 dark:bg-gray-800/40 justify-between lg:justify-end'>
-							<Link
-								className='flex items-center gap-2 font-semibold lg:hidden'
-								href='/'
-							>
-								<span className=''>Suitemate</span>
-							</Link>
-						</header> */}
+				<Link className='flex items-center gap-2 font-semibold lg:hidden' href='/'>
+				  <span className=''>Suitemate</span>
+				</Link>
+			  </header> */}
 						{children}
 					</div>
 				</div>
