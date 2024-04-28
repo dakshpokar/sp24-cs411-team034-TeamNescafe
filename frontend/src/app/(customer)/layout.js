@@ -17,7 +17,7 @@ export default function CustomerLayout({ children }) {
 									href='/'
 								>
 									{/* <Logo /> */}
-									<span className='subpixel-antialiased text-2xl  '>
+									<span className='font-sans font-bold subpixel-antialiased text-2xl  '>
 										Suitemate
 									</span>
 								</Link>

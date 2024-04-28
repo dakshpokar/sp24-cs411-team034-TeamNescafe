@@ -34,7 +34,7 @@ export default function AgentDashboard() {
 							</th>
 						</tr>
 					</thead>
-					<tbody className='text-center'>
+					<tbody>
 						{dashboardData.map((item, index) => (
 							<tr
 								key={index}
