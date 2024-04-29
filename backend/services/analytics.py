@@ -98,28 +98,7 @@ def popular_properties():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# @analytics_service.route('/example_query', methods=['GET'])
-# def example_query():
-#     try:
-#         print("HEY")
-#         conn = connect_to_database()
-#         if conn:
-#             cursor = conn.cursor()
-#             if(cursor):
-#                 try:
-#                     cursor.callproc('complex_stored_procedure_for_filtering', [0, 600, 800, 600, 1000])
 
-#                     results = []
-#                     for result in cursor.stored_results():
-#                         results.append(result.fetchall())
-#                     print(results)
-#                     return jsonify({'success': 'Query executed successfully.'})
-#                 finally:
-#                     conn.close()
-#         else:
-#             return jsonify({'error': 'Failed to establish database connection.'}), 500
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 500
 
 @analytics_service.route('/apps_per_user', methods=['GET'])
 def apps_per_user():

@@ -142,7 +142,7 @@ def list_properties():
                 if len(whereParts) > 0:
                     query += " WHERE "
                     query += " and ".join(whereParts)
-                query += ';'
+                query += ' order by p.name;'
                 rows = run_query(conn, query)
 
                 query2 = ("select * from propertyphoto;")
@@ -269,7 +269,7 @@ def check_application_status():
         token = request.headers['Authorization']
         user_id = get_user_id(connection, token)
         unit_id = request.args['unit_id']
-
+       
         conn = connect_to_database()
         if conn:
             try:
@@ -352,5 +352,47 @@ def add_review():
                 conn.close()
         else:
             return jsonify({'error': 'Failed to establish database connection.'}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@customer_service.route('/advanced_properties_filter', methods=['GET'])
+def advanced_properties_filter():
+    try:
+        token = request.headers['Authorization']
+        user_id = get_user_id(connection, token)
+        if check_agent_role(connection, user_id):
+            return jsonify({'error': "User is an Agent"}), 403
+        data = request.args
+        flag = sanitize_input(data.get('flag'))
+        pricemin = sanitize_input(data.get('pricemin'))
+        pricemax = sanitize_input(data.get('pricemax'))
+        areamin = sanitize_input(data.get('areamin', ))
+        areamax = sanitize_input(data.get('areamax'))
+        conn = connect_to_database()
+        if conn:
+            cursor = conn.cursor()
+            if(cursor):
+                try:
+                    cursor.callproc('complex_stored_procedure_for_filtering', [flag, areamin, areamax, pricemin, pricemax])
+                    results = []
+                    for result in cursor.stored_results():
+
+                        results.append(result.fetchall())
+                    sub = results[0]
+                    final_result_pro_max = []
+                    for i in sub:
+                        final_result_pro_max.append({
+                            'property_id': i[0],
+                            'property_name': i[1],
+                            'pincode': i[2],
+                            'avg_rating': float(i[3]),
+                            'num_reviews': i[4]
+                        })
+                    print(final_result_pro_max)
+                    return jsonify({'data': final_result_pro_max})
+                finally:
+                    conn.close()
+            else:
+                return jsonify({'error': 'Failed to establish database connection.'}), 500
     except Exception as e:
         return jsonify({'error': str(e)}), 500
