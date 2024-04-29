@@ -80,9 +80,20 @@ def sign_up():
                 return jsonify({'success': False, 'message': "Failed to sign up"}), 409
         else:
             return jsonify({'success': False, 'message': "Email Id is already in use!"}), 409
-
-        results = {'success': True, 'message':'Sign Up Successful'}
-        return jsonify(results)
+        query = f"SELECT user_id, email_id, role_type, first_name, last_name, phone_number, gender, date_of_birth FROM user WHERE email_id = '{email_id}';"
+        row = run_query(connection, query)[0]
+        results = {'user_id': row[0],
+                    'email_id': row[1],
+                    'role_type': row[2],
+                    'first_name': row[3],
+                    'last_name': row[4],
+                    'phone_number': row[5],
+                    'gender': row[6],
+                    'date_of_birth': row[7]
+                }
+        token = generate_token()
+        insert_token(connection, row[0], token)
+        return jsonify({'success': True, 'message': 'Sign Up Successful', 'token':token, 'user':results})
 
     except Exception as e:
         print(e)
