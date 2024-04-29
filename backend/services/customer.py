@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from utils import *
 from db import connection, connect_to_database
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 customer_service = Blueprint('customer_service', __name__, url_prefix='/customer')
 
@@ -335,7 +336,7 @@ def add_review():
         property_id = data.get('property_id')
         comment = data.get('comment')
         rating = data.get('rating')
-        created_at = datetime.now().strftime('%Y-%m-%d')
+        created_at = datetime.now(tz=ZoneInfo("America/Chicago")).strftime('%Y-%m-%d')
         success = True
 
         conn = connect_to_database()
@@ -366,7 +367,7 @@ def advanced_properties_filter():
         flag = sanitize_input(data.get('flag'))
         pricemin = sanitize_input(data.get('pricemin'))
         pricemax = sanitize_input(data.get('pricemax'))
-        areamin = sanitize_input(data.get('areamin', ))
+        areamin = sanitize_input(data.get('areamin'))
         areamax = sanitize_input(data.get('areamax'))
         conn = connect_to_database()
         if conn:
@@ -379,17 +380,25 @@ def advanced_properties_filter():
 
                         results.append(result.fetchall())
                     sub = results[0]
+
+                    # property_ids = [row[0] for row in sub]
+
+                    # query2 = ("select * from propertyphoto;")
+                    # rows2 = run_query(conn, query2)
+                    
                     final_result_pro_max = []
                     for i in sub:
-                        final_result_pro_max.append({
-                            'property_id': i[0],
-                            'property_name': i[1],
-                            'pincode': i[2],
-                            'avg_rating': float(i[3]),
-                            'num_reviews': i[4]
-                        })
-                    print(final_result_pro_max)
+                        final_result_pro_max.append(
+                            i[0]
+                            # 'property_name': i[1],
+                            # 'pincode': i[2],
+                            # 'avg_rating': float(i[3]),
+                            # 'num_reviews': i[4],
+                            # # 'photos:': [row2[1] for row2 in rows2 if row2[0] == i[0]]
+                        )
+                    # print(final_result_pro_max)
                     return jsonify({'data': final_result_pro_max})
+                    # return jsonify({'data': sub})
                 finally:
                     conn.close()
             else:
