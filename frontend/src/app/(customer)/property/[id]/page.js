@@ -33,10 +33,14 @@ const PropertyDetails = () => {
 			.then(() => {
 				window.location.reload();
 			})
-			.catch(() => {
-				toast.error(
-					"Can't post multiple reviews for a property."
-				);
+			.catch((e) => {
+				if (e.response.data.error.includes("Duplicate")){
+					toast.error("Can't post multiple reviews for a property.");
+				} else if (e.response.data.error.includes("review_length")) {
+					toast.error("Review length cannot exceed 200 characters.")
+				} else {
+					toast.error(e.response.data.error)
+				}
 			});
 	};
 

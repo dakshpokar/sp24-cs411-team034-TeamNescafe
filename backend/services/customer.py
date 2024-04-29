@@ -345,7 +345,9 @@ def add_review():
                          f"VALUES ({user_id}, {property_id}, '{created_at}', '{comment}', '{rating}');")
                 if not run_update_query(conn, query):
                     success = False
-                    return jsonify({'success': success}), 409
+                    file1 = open('./backend/error.txt', 'r')
+                    error = file1.read()
+                    return jsonify({'success': success, 'error': error}), 409
                 result = {'success': success}
                 return jsonify(result)
             finally:
