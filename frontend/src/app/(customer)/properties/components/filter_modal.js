@@ -57,6 +57,13 @@ const PropertyFilterModal = ({
 
 	const handleResetFilter = () => {
 		resetFilters();
+		setBedrooms('');
+		setBathrooms('');
+		setMaxPrice('');
+		setMinPrice('');
+		setPincode('');
+		setCompanyName('');
+
 		setSelectedCheck1(false);
 		setSelectedCheck2(false);
 		setCheckMaxArea('');
