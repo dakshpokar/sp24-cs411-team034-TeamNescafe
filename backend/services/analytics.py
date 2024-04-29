@@ -98,6 +98,8 @@ def popular_properties():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
+
 @analytics_service.route('/apps_per_user', methods=['GET'])
 def apps_per_user():
     try:
