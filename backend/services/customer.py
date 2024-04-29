@@ -88,10 +88,10 @@ def submit_preferences():
         conn = connect_to_database()
         if conn:
             try:
-                for key in data.keys():
-                    if data[key] != '-':
+                for i,(key,val) in enumerate(data.items()):
+                    if val != '-':
                         query = (f"INSERT INTO userdetails (user_id, pref_id, value) "
-                                 f"VALUES ({user_id}, {key}, '{data[key]}');")
+                                 f"VALUES ({user_id}, {i+2}, '{val}');")
                         run_update_query(conn, query)
 
                 result = {'success': True}

@@ -30,9 +30,18 @@ export default function SignUp() {
 		apiService
 			.signup(formData)
 			.then((response) => {
-				toast.success('Signed up Successfully !');
-				console.log(response);
-				push('/login');
+				if (response.token) {
+					localStorage.setItem('token', response.token);
+					localStorage.setItem(
+						'user',
+						JSON.stringify(response.user)
+					);
+					toast.success('Signed up Successfully !');
+					const user = localStorage.getItem('user');
+					if (user) {
+						push('/register/preferences');
+					}
+				}
 			})
 			.catch((error) => {
 				console.log(error);
