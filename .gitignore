@@ -3,6 +3,7 @@ frontend/suitemate/package-lock.json
 venv
 backend/__pycache__
 backend/configs/config.json
+backend/error.txt
 .DS_Store
 .vscode
 

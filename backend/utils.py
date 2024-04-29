@@ -93,6 +93,8 @@ def run_update_query(connection, query):
             return True
         except Exception as e:
             connection.rollback()
+            file1 = open('./backend/error.txt', 'w')
+            file1.write(str(e))
             print(e)
             return False
 
