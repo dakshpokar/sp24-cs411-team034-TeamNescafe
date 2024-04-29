@@ -8,6 +8,7 @@ const PropertyFilterModal = ({
 	setOpen,
 	applyFilters,
 	resetFilters,
+	fetchHighlyRatedProperties,
 }) => {
 	const [bedrooms, setBedrooms] = useState(filters.bedrooms || '');
 	const [bathrooms, setBathrooms] = useState(
@@ -20,7 +21,29 @@ const PropertyFilterModal = ({
 		filters.companyName || ''
 	);
 
+	const [selectedCheck1, setSelectedCheck1] = useState(0);
+	const [selectedCheck2, setSelectedCheck2] = useState(0);
+	const [checkMinPrice, setCheckMinPrice] = useState('');
+	const [checkMaxPrice, setCheckMaxPrice] = useState('');
+	const [checkMinArea, setCheckMinArea] = useState('');
+	const [checkMaxArea, setCheckMaxArea] = useState('');
+
 	const handleApplyFilters = () => {
+		let flag = '0';
+		if (selectedCheck1 && !selectedCheck2) {
+			flag = '1';
+		} else if (!selectedCheck1 && selectedCheck2) {
+			flag = '2';
+		}
+		if (selectedCheck1 || selectedCheck2) {
+			fetchHighlyRatedProperties(
+				flag,
+				checkMinArea,
+				checkMaxArea,
+				checkMinPrice,
+				checkMaxPrice
+			);
+		}
 		applyFilters({
 			bedrooms,
 			bathrooms,
@@ -34,7 +57,35 @@ const PropertyFilterModal = ({
 
 	const handleResetFilter = () => {
 		resetFilters();
+		setBedrooms('');
+		setBathrooms('');
+		setMaxPrice('');
+		setMinPrice('');
+		setPincode('');
+		setCompanyName('');
+
+		setSelectedCheck1(false);
+		setSelectedCheck2(false);
+		setCheckMaxArea('');
+		setCheckMinArea('');
+		setCheckMinPrice('');
+		setCheckMaxPrice('');
 		setOpen(false);
+	};
+
+	const handleCheckboxChange = (checkbox, isChecked) => {
+		if (checkbox === 'check1') {
+			setSelectedCheck1(isChecked);
+		} else if (checkbox === 'check2') {
+			setSelectedCheck2(isChecked);
+		}
+
+		if (!isChecked) {
+			setCheckMaxArea('');
+			setCheckMinArea('');
+			setCheckMinPrice('');
+			setCheckMaxPrice('');
+		}
 	};
 
 	return (
@@ -79,7 +130,7 @@ const PropertyFilterModal = ({
 											leaveFrom='opacity-100'
 											leaveTo='opacity-0'
 										>
-											<div className='absolute left-0 top-0 -ml-8 flex pr-2 pt-4 sm:-ml-10 sm:pr-4'>
+											<div className='absolute left-0 top-0 flex pr-2 pt-4 sm:-ml-10 sm:pr-4'>
 												<button
 													type='button'
 													className='relative rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white'
@@ -100,20 +151,178 @@ const PropertyFilterModal = ({
 										</Transition.Child>
 										<div className='flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl'>
 											<div className='px-4 sm:px-6'>
-												<Dialog.Title className='text-base font-semibold leading-6 text-gray-900'>
+												<Dialog.Title className='text-base text-center font-semibold leading-6 text-gray-900'>
 													Property Filters
 												</Dialog.Title>
 											</div>
+											<div className='flex flex-col items-center border-t border-gray-200 rounded dark:border-gray-700 px-4 mt-4'>
+												<div className='flex'>
+													<input
+														type='checkbox'
+														checked={
+															selectedCheck1
+														}
+														onChange={(
+															e
+														) =>
+															handleCheckboxChange(
+																'check1',
+																e
+																	.target
+																	.checked
+															)
+														}
+														className='accent-orange-600 outline-none'
+													/>
+													<label
+														for='bordered-checkbox-1'
+														className='w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300'
+													>
+														Highest rated
+														properties
+														within area
+														range:
+													</label>
+												</div>
+												<div className='flex gap-8 w-full items-center mb-2 '>
+													<input
+														type='text'
+														placeholder='Min. Area'
+														className='p-2 border rounded-md w-full'
+														value={
+															checkMinArea
+														}
+														onChange={(
+															e
+														) => {
+															selectedCheck1
+																? setCheckMinArea(
+																		e
+																			.target
+																			.value
+																  )
+																: setCheckMinArea(
+																		''
+																  );
+														}}
+													/>
+													<span className='font-bold'>
+														-
+													</span>
+													<input
+														type='text'
+														placeholder='Max. Area'
+														className='p-2 border rounded-md w-full'
+														value={
+															checkMaxArea
+														}
+														onChange={(
+															e
+														) => {
+															selectedCheck1
+																? setCheckMaxArea(
+																		e
+																			.target
+																			.value
+																  )
+																: setCheckMaxArea(
+																		''
+																  );
+														}}
+													/>
+												</div>
+											</div>
+											<div className='flex flex-col items-center border-b border-gray-200 rounded dark:border-gray-700 px-4 pb-2'>
+												<div className='flex'>
+													<input
+														type='checkbox'
+														checked={
+															selectedCheck2
+														}
+														onChange={(
+															e
+														) =>
+															handleCheckboxChange(
+																'check2',
+																e
+																	.target
+																	.checked
+															)
+														}
+														className='accent-orange-600 outline-none'
+													/>
+													<label
+														for='bordered-checkbox-1'
+														className='w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300'
+													>
+														Highest rated
+														properties
+														within price
+														range:
+													</label>
+												</div>
+												<div className='flex gap-8 w-full items-center mb-2 '>
+													<input
+														type='text'
+														placeholder='Min. Price'
+														className='p-2 border rounded-md w-full'
+														value={
+															checkMinPrice
+														}
+														onChange={(
+															e
+														) => {
+															selectedCheck2
+																? setCheckMinPrice(
+																		e
+																			.target
+																			.value
+																  )
+																: setCheckMinPrice(
+																		''
+																  );
+														}}
+													/>
+													<span className='font-bold'>
+														-
+													</span>
+													<input
+														type='text'
+														placeholder='Max. Price'
+														className='p-2 border rounded-md w-full'
+														value={
+															checkMaxPrice
+														}
+														onChange={(
+															e
+														) => {
+															selectedCheck2
+																? setCheckMinPrice(
+																		e
+																			.target
+																			.value
+																  )
+																: setCheckMinPrice(
+																		''
+																  );
+														}}
+													/>
+												</div>
+											</div>
 
-											<div className='relative mt-6 flex-1 px-4 sm:px-6'>
-												<div>
+											<div className='mt-6 flex flex-col'>
+												<div className='flex gap-2 w-full px-4'>
 													<input
 														type='text'
 														value={
 															bathrooms
 														}
+														disabled={
+															selectedCheck1 ||
+															selectedCheck2
+														}
 														placeholder='Bathrooms'
-														className='p-2 mb-2 border rounded-md mr-6'
+														className='p-2 mb-2 border rounded-md w-full'
 														onChange={(
 															e
 														) =>
@@ -129,8 +338,12 @@ const PropertyFilterModal = ({
 														value={
 															bedrooms
 														}
+														disabled={
+															selectedCheck1 ||
+															selectedCheck2
+														}
 														placeholder='Bedrooms'
-														className='p-2 mb-2 border rounded-md mr-6'
+														className='p-2 mb-2 border rounded-md w-full'
 														onChange={(
 															e
 														) =>
@@ -141,14 +354,19 @@ const PropertyFilterModal = ({
 															)
 														}
 													/>
-
+												</div>
+												<div className='flex gap-2 w-full px-4'>
 													<input
 														type='text'
 														value={
 															pricemin
 														}
+														disabled={
+															selectedCheck1 ||
+															selectedCheck2
+														}
 														placeholder='Min. Price'
-														className='p-2 mb-2 border rounded-md mr-6 mt-2'
+														className='p-2 mb-2 border rounded-md w-full '
 														onChange={(
 															e
 														) =>
@@ -164,8 +382,12 @@ const PropertyFilterModal = ({
 														value={
 															pricemax
 														}
+														disabled={
+															selectedCheck1 ||
+															selectedCheck2
+														}
 														placeholder='Max. Price'
-														className='p-2 mb-2 border rounded-md mr-6 mb-2'
+														className='p-2 mb-2 border rounded-md w-full'
 														onChange={(
 															e
 														) =>
@@ -176,13 +398,19 @@ const PropertyFilterModal = ({
 															)
 														}
 													/>
+												</div>
+												<div className='flex gap-2 w-full px-4'>
 													<input
 														type='text'
 														value={
 															pincode
 														}
+														disabled={
+															selectedCheck1 ||
+															selectedCheck2
+														}
 														placeholder='Pincode'
-														className='p-2 mb-2 border rounded-md mr-6'
+														className='p-2 mb-2 border rounded-md w-full'
 														onChange={(
 															e
 														) =>
@@ -198,8 +426,12 @@ const PropertyFilterModal = ({
 														value={
 															companyName
 														}
+														disabled={
+															selectedCheck1 ||
+															selectedCheck2
+														}
 														placeholder='Company Name'
-														className='p-2 mb-2 border rounded-md mr-6'
+														className='p-2 mb-2 border rounded-md w-full'
 														onChange={(
 															e
 														) =>
@@ -211,7 +443,8 @@ const PropertyFilterModal = ({
 														}
 													/>
 												</div>
-												<div className='mt-4'>
+
+												<div className='mt-4 flex items-center justify-center'>
 													<button
 														type='button'
 														onClick={() =>
