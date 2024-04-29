@@ -284,6 +284,13 @@ const Properties = () => {
 			{Object.keys(filters).length > 0 && (
 				<div className='flex items-center gap-2'>
 					<p className='text-gray-500'>Filters Applied:</p>
+					{highlyRatedPropertyIds &&
+						highlyRatedPropertyIds.length > 0 && (
+							<p className='text-gray-700'>
+								Advanced Filter
+							</p>
+						)}
+
 					{Object.keys(filters).map(
 						(key) =>
 							filters[key] && (
