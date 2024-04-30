@@ -124,7 +124,6 @@ def get_unit_app_count():
             try:
                 query = (f"select company_id from agentcompanyrelationship where user_id={user_id}")
                 company_id = run_query(conn, query)[0][0]
-                print(company_id)
 
                 query = (f"SELECT u.unit_id, p.property_id, u.apartment_no, "
                          f"p.name, "
