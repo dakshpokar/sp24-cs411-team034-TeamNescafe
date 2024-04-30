@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from utils import *
 from db import connection, connect_to_database
 from datetime import datetime
-from zoneinfo import ZoneInfo
+
 
 customer_service = Blueprint('customer_service', __name__, url_prefix='/customer')
 
@@ -182,7 +182,7 @@ def get_property_from_id():
                 query2 = (f"select * from propertyphoto where property_id = {property_id};")
                 rows2 = run_query(conn, query2)
 
-                query3 = f"SELECT u.first_name, u.last_name, r.created_at, r.comment, r.rating FROM reviews as r join user as u on r.user_id=u.user_id where r.property_id = {property_id};"
+                query3 = f"SELECT u.first_name, u.last_name, r.created_at, r.comment, r.rating, r.user_id FROM reviews as r join user as u on r.user_id=u.user_id where r.property_id = {property_id};"
                 rows3 = run_query(conn, query3)
 
                 query4 = f"SELECT unit_id, apartment_no from unit where property_id={property_id};"
@@ -197,7 +197,8 @@ def get_property_from_id():
                             'user_name': row[0] + ' ' + row[1],
                             'created_at': row[2],
                             'comment': row[3],
-                            'rating': row[4]
+                            'rating': row[4],
+                            'user_id': row[5]
                         })
                     avgRating /= len(reviews)
 
@@ -328,19 +329,22 @@ def add_review():
     try:
         headers = request.headers
         token = headers['Authorization']
-        user_id = get_user_id(connection, token)
-        if check_agent_role(connection, user_id):
-            return jsonify({'error': "User is an Agent"}), 403
+        conn = connect_to_database()
 
         data = request.json
         property_id = data.get('property_id')
         comment = data.get('comment')
         rating = data.get('rating')
-        created_at = datetime.now(tz=ZoneInfo("America/Chicago")).strftime('%Y-%m-%d')
+        created_at = datetime.now().strftime('%Y-%m-%d')
         success = True
 
-        conn = connect_to_database()
-        if conn:
+        
+        if conn and conn.is_connected():
+            conn.start_transaction('SERIALIZABLE')
+
+            user_id = get_user_id(conn, token)
+            if check_agent_role(conn, user_id):
+                return jsonify({'error': "User is an Agent"}), 403
             try:
                 query = (f"INSERT INTO reviews (user_id, property_id, created_at, comment, rating) "
                          f"VALUES ({user_id}, {property_id}, '{created_at}', '{comment}', '{rating}');")
@@ -381,29 +385,47 @@ def advanced_properties_filter():
                     for result in cursor.stored_results():
 
                         results.append(result.fetchall())
-                    sub = results[0]
-
-                    # property_ids = [row[0] for row in sub]
-
-                    # query2 = ("select * from propertyphoto;")
-                    # rows2 = run_query(conn, query2)
-                    
+                    sub = results[0]                    
                     final_result_pro_max = []
                     for i in sub:
                         final_result_pro_max.append(
                             i[0]
-                            # 'property_name': i[1],
-                            # 'pincode': i[2],
-                            # 'avg_rating': float(i[3]),
-                            # 'num_reviews': i[4],
-                            # # 'photos:': [row2[1] for row2 in rows2 if row2[0] == i[0]]
                         )
-                    # print(final_result_pro_max)
                     return jsonify({'data': final_result_pro_max})
-                    # return jsonify({'data': sub})
                 finally:
                     conn.close()
             else:
                 return jsonify({'error': 'Failed to establish database connection.'}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+@customer_service.route('/delete_review',methods=['POST'])
+def delete_review():
+    try:
+        headers = request.headers
+        token = headers['Authorization']
+        user_id = get_user_id(connection, token)
+        if check_agent_role(connection, user_id):
+            return jsonify({'error': "User is an Agent"}), 403
+
+        data = request.json
+        user_id = data.get('user_id')
+        property_id = data.get('property_id')
+
+        success = True
+
+        conn = connect_to_database()
+        if conn:
+            try:
+                query = (f"DELETE FROM reviews WHERE user_id = {user_id} AND property_id = {property_id};")
+                if not run_update_query(conn, query):
+                    success = False
+                    return jsonify({'success': success}), 409
+                result = {'success': success}
+                return jsonify(result)
+            finally:
+                conn.close()
+        else:
+            return jsonify({'error': 'Failed to establish database connection.'}), 500
     except Exception as e:
         return jsonify({'error': str(e)}), 500

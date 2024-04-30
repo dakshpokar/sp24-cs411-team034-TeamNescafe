@@ -42,6 +42,7 @@ const post = async (endpoint, data, isAuthorised = false) => {
 const apiService = {
 	login: async (data) => post('auth/login', data),
 	signup: async (data) => post('auth/sign_up', data),
+	signout: async (data) => post('auth/signout', data),
 	submitApplication: async (data) =>
 		post('customer/submit_application', data, true),
 	listProperties: async (params) =>
@@ -65,10 +66,16 @@ const apiService = {
 		post('agent/update_application', data, true),
 	advancedPropertiesFilter: async (params) =>
 		get('customer/advanced_properties_filter', true, params),
-	analyticsPopularProperties: async (params) => get('analytics/popular_properties', true, params),
-	analyticsAppsPerUser: async () => get('analytics/apps_per_user', true),
-	analyticsProperty: async (params) => get('analytics/property_ratings_by_area', true, params),
-	analyticsPincode: async (params) => get('analytics/pincode_analytics', true, params),
+	analyticsPopularProperties: async (params) =>
+		get('analytics/popular_properties', true, params),
+	analyticsAppsPerUser: async () =>
+		get('analytics/apps_per_user', true),
+	analyticsProperty: async (params) =>
+		get('analytics/property_ratings_by_area', true, params),
+	analyticsPincode: async (params) =>
+		get('analytics/pincode_analytics', true, params),
+	deleteReview: async (data) =>
+		post('customer/delete_review', data, true),
 };
 
 export default apiService;
