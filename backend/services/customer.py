@@ -329,9 +329,7 @@ def add_review():
     try:
         headers = request.headers
         token = headers['Authorization']
-        user_id = get_user_id(connection, token)
-        if check_agent_role(connection, user_id):
-            return jsonify({'error': "User is an Agent"}), 403
+        conn = connect_to_database()
 
         data = request.json
         property_id = data.get('property_id')
@@ -340,8 +338,13 @@ def add_review():
         created_at = datetime.now().strftime('%Y-%m-%d')
         success = True
 
-        conn = connect_to_database()
-        if conn:
+        
+        if conn and conn.is_connected():
+            conn.start_transaction('SERIALIZABLE')
+
+            user_id = get_user_id(conn, token)
+            if check_agent_role(conn, user_id):
+                return jsonify({'error': "User is an Agent"}), 403
             try:
                 query = (f"INSERT INTO reviews (user_id, property_id, created_at, comment, rating) "
                          f"VALUES ({user_id}, {property_id}, '{created_at}', '{comment}', '{rating}');")
