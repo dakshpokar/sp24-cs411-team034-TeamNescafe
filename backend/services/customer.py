@@ -382,29 +382,47 @@ def advanced_properties_filter():
                     for result in cursor.stored_results():
 
                         results.append(result.fetchall())
-                    sub = results[0]
-
-                    # property_ids = [row[0] for row in sub]
-
-                    # query2 = ("select * from propertyphoto;")
-                    # rows2 = run_query(conn, query2)
-                    
+                    sub = results[0]                    
                     final_result_pro_max = []
                     for i in sub:
                         final_result_pro_max.append(
                             i[0]
-                            # 'property_name': i[1],
-                            # 'pincode': i[2],
-                            # 'avg_rating': float(i[3]),
-                            # 'num_reviews': i[4],
-                            # # 'photos:': [row2[1] for row2 in rows2 if row2[0] == i[0]]
                         )
-                    # print(final_result_pro_max)
                     return jsonify({'data': final_result_pro_max})
-                    # return jsonify({'data': sub})
                 finally:
                     conn.close()
             else:
                 return jsonify({'error': 'Failed to establish database connection.'}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+@customer_service.route('/delete_review',methods=['POST'])
+def delete_review():
+    try:
+        headers = request.headers
+        token = headers['Authorization']
+        user_id = get_user_id(connection, token)
+        if check_agent_role(connection, user_id):
+            return jsonify({'error': "User is an Agent"}), 403
+
+        data = request.json
+        user_id = data.get('user_id')
+        property_id = data.get('property_id')
+
+        success = True
+
+        conn = connect_to_database()
+        if conn:
+            try:
+                query = (f"DELETE FROM reviews WHERE user_id = {user_id} AND property_id = {property_id};")
+                if not run_update_query(conn, query):
+                    success = False
+                    return jsonify({'success': success}), 409
+                result = {'success': success}
+                return jsonify(result)
+            finally:
+                conn.close()
+        else:
+            return jsonify({'error': 'Failed to establish database connection.'}), 500
     except Exception as e:
         return jsonify({'error': str(e)}), 500

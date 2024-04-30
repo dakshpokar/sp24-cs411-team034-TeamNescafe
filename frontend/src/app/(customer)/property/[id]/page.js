@@ -1,4 +1,5 @@
 'use client';
+
 import { useState, useEffect } from 'react';
 import apiService from '@/controllers/apiService';
 import { useParams } from 'next/navigation';
@@ -14,7 +15,9 @@ const PropertyDetails = () => {
 	const [property, setProperty] = useState([]);
 	const [review, setReview] = useState([]);
 	const [rating, setRating] = useState([]);
-	const currentUserId = localStorage.getItem('user')['user_id'];
+	let currentUserId =
+		localStorage &&
+		JSON.parse(localStorage.getItem('user'))?.user_id;
 
 	const handleReviewInput = (r) => {
 		setReview(r);
@@ -36,13 +39,31 @@ const PropertyDetails = () => {
 				window.location.reload();
 			})
 			.catch((e) => {
-				if (e.response.data.error.includes("Duplicate")){
-					toast.error("Can't post multiple reviews for a property.");
-				} else if (e.response.data.error.includes("review_length")) {
-					toast.error("Review length cannot exceed 200 characters.")
+				if (e.response.data.error.includes('Duplicate')) {
+					toast.error(
+						"Can't post multiple reviews for a property."
+					);
+				} else if (
+					e.response.data.error.includes('review_length')
+				) {
+					toast.error(
+						'Review length cannot exceed 200 characters.'
+					);
 				} else {
-					toast.error("Can't add review.")
+					toast.error("Can't add review.");
 				}
+			});
+	};
+
+	const handleDelete = (userId, propertyId) => {
+		apiService
+			.deleteReview({
+				user_id: userId,
+				property_id: propertyId,
+			})
+			.then(() => {
+				toast.success('Review deleted successfully.');
+				window.location.reload();
 			});
 	};
 
@@ -53,6 +74,8 @@ const PropertyDetails = () => {
 				setProperty(propertyDetails);
 			});
 	}, []);
+
+	console.log('token', currentUserId);
 
 	const {
 		name,
@@ -156,14 +179,13 @@ const PropertyDetails = () => {
 								Reviews
 							</h3>
 							{reviews.map((review, index) => (
-								
 								<div
 									key={index}
 									className='w-full border-collapse rounded-lg border-b my-4 '
 								>
 									<div className='flex justify-between items-center px-2'>
 										<p className='font-semibold px-2'>
-											{review.user_id}
+											{review.user_name}
 										</p>
 										<p className='px-2'>
 											{review.rating}/5
@@ -173,23 +195,26 @@ const PropertyDetails = () => {
 										<p className='px-2 py-1'>
 											{review.comment}
 										</p>
-										{
-											review.user_id === parseInt(currentUserId) && (
-												<button
-													className='p-2'
-													onClick={() => handleDelete(index)} // replace handleDelete with your delete function
-												>
-													<TrashIcon className='h-4 w-4 text-gray-500' />
-												</button>)
-										}
-										
+										{review.user_id ===
+											currentUserId && (
+											<button
+												className='p-2'
+												onClick={() =>
+													handleDelete(
+														review.user_id,
+														id
+													)
+												}
+											>
+												<TrashIcon className='h-4 w-4 text-gray-500' />
+											</button>
+										)}
 									</div>
 									<p className='text-sm text-gray-500 px-4 py-2'>
 										{new Date(
 											review.created_at
 										).toLocaleDateString()}
 									</p>
-									
 								</div>
 							))}
 							<textarea
