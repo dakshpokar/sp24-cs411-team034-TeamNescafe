@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from utils import *
-from db import connection, connect_to_database, run_query, run_update_query
+from db import connection, connect_to_database
 
 analytics_service = Blueprint('analytics_service', __name__, url_prefix='/analytics')
 

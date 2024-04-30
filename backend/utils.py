@@ -2,7 +2,6 @@ import json
 import secrets
 import string
 import os
-from db import run_query, run_update_query
 
 def load_backend_config():
     """This loads backend config
@@ -56,6 +55,49 @@ def sanitize_input(data):
         return data.strip()
     return None
 
+def run_query(connection, query):
+    """This function runs a read type query on the database
+
+    Args:
+        connection (object): database connection object
+        query (str): query to be executed
+    
+    Returns:
+        list: list of tuples containing the result of the query
+    """
+    if connection:
+        cursor = connection.cursor()
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        cursor.close()
+        return rows
+    else:
+        return False
+    
+def run_update_query(connection, query):
+    """This function runs an update type query on the database
+
+    Args:
+        connection (object): database connection object
+        query (str): query to be executed
+    
+    Returns:
+        list: list of tuples containing the result of the query
+    """
+    if connection:
+        cursor = connection.cursor()
+        try:
+            cursor.execute(query)
+            connection.commit()
+            cursor.close()
+            return True
+        except Exception as e:
+            connection.rollback()
+            file1 = open('./backend/error.txt', 'w')
+            file1.write(str(e))
+            print(e)
+            return False
+
 def get_user_id(connection, token):
     """This function gets the user id from the token
 
@@ -99,6 +141,7 @@ def insert_token(connection, user_id, token):
     """
     query = f"insert into tokens(token, user_id) values('{token}', {user_id});"
     run_update_query(connection, query)
+    print("Token Submitted")
 
 def verify_unique_email(connection, email_id):
     query = f"SELECT * from user where email_id = '{email_id}';"
