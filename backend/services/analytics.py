@@ -155,7 +155,6 @@ def pincode_analytics():
                     f"ROUND(AVG(u.area)) AS Avg_Area "
                     f"FROM property p NATURAL JOIN unit u {where_clause} "
                     f"GROUP BY p.pincode order by p.pincode;")
-                print(query)
 
                 rows = run_query(conn, query)
 
