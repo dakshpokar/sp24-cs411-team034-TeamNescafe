@@ -140,6 +140,14 @@ def apps_per_user():
 @analytics_service.route('/pincode_analytics', methods=['GET'])
 def pincode_analytics():
     try:
+        pincodes = ("61820, 61821, 61822, 61823, 61824, 61825, 61826, 61827, 61828, 61829, 61830, 61831, 61832, 61833, 61834, 61835, 61836, 61837, "
+                    "61838, 61839, 61840, 61841, 61842, 61843, 61844, 61845, 61846, 61847, 61848, 61849, 61850, 61851, 61852, 61853, 61854, 61855, "
+                    "61856, 61857, 61858, 61859, 61860, 61861, 61862, 61863, 61864, 61865, 61866, 61867, 61868, 61869, 61870")
+
+
+        if request.args['pincodes']:
+            pincodes = request.args['pincodes']
+
         conn = connect_to_database()
         if conn:
             try:
@@ -147,7 +155,7 @@ def pincode_analytics():
                     f"SELECT p.pincode, MIN(u.price) AS Min_Rent, MAX(u.price) AS Max_Rent, "
                     f"ROUND(AVG(u.price)) AS Avg_Rent, MIN(u.area) AS Min_Area, MAX(u.area) AS Max_Area, "
                     f"ROUND(AVG(u.area)) AS Avg_Area "
-                    f"FROM property p NATURAL JOIN unit u "
+                    f"FROM property p NATURAL JOIN unit u where p.pincode in ({pincodes}) "
                     f"GROUP BY p.pincode order by p.pincode;"
 )
                 rows = run_query(conn, query)

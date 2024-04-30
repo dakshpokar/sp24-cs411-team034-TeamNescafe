@@ -14,10 +14,16 @@ import 'chart.js/auto';
 		const [bathrooms, setBathrooms] = useState('');
 		const [min_area, setMinArea] = useState('');
 		const [max_area, setMaxArea] = useState('');
+		const [pincodes, setPincodes] = useState('');
 		const [properties, setProperties] = useState([]);
 		const [propertydata, setPropertyData] = useState([]);
 		const [pincodedata, setPincodeData] = useState([]);
 		const [isLoading, setIsLoading] = useState(false);
+
+
+		const handlePincodeChange = (e) => {
+			setPincodes(e.target.value);
+		};
 
 		const handleBathroomChange = (e) => {
 			setBathrooms(e.target.value);
@@ -72,7 +78,7 @@ import 'chart.js/auto';
 		const handlePincodeAnalytics = (e) => {
 			e.preventDefault();
 			apiService
-				.analyticsPincode()
+				.analyticsPincode({pincodes:pincodes})
 				.then((props) => {
 					setPincodeData(props);
 				  }).then(changeFlag(4))
@@ -97,6 +103,18 @@ import 'chart.js/auto';
 				data: pincodedata.map(d => d.avg_area),
 				backgroundColor: 'rgba(54, 162, 235, 0.6)',
 			  },
+			],
+		  };		
+
+
+		const chartData_2 = {
+			labels: pincodedata.map(d => d.pincode.toString()), 
+			datasets: [
+			  {
+				label: 'Area to Rent Ratio',
+				data: pincodedata.map(d => d.avg_area / d.avg_rent),
+				backgroundColor: 'rgba(255, 99, 132, 0.6)', 
+			  }
 			],
 		  };		
 
@@ -220,6 +238,20 @@ import 'chart.js/auto';
         style={{ flex: 1 }}
       >
 		<div>
+          <label className="block text-sm font-medium leading-6 text-gray-900">
+            Pincodes
+          </label>
+          <div className="mt-2">
+            <input
+              id="pincodes"
+              name="pincodes"              
+              value={pincodes}
+              onChange={handlePincodeChange}
+              className="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-orange-600 sm:text-sm sm:leading-6"
+            />
+          </div>
+        </div>
+		<div>
           <button
             type="submit"
             className="flex w-full justify-center rounded-md bg-orange-400 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-orange-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600"
@@ -322,8 +354,10 @@ import 'chart.js/auto';
 						<div>
 							<h2>Pincode Data Chart</h2>
 							<Line data={chartData} />
-							<Bar data={chartData} />
+							<h2 style={{ marginTop: '24px' }}>Pincode Area to Rent Ratio Chart</h2>
+							<Bar data={chartData_2} />
 						</div>
+						<h2 style={{ marginTop: '24px' }}>Pincode Data</h2>
 						<table className='min-w-full'>
 							<thead>
 								<tr>
