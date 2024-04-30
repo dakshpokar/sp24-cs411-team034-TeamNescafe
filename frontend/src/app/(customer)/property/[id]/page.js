@@ -1,4 +1,5 @@
 'use client';
+
 import { useState, useEffect } from 'react';
 import apiService from '@/controllers/apiService';
 import { useParams } from 'next/navigation';
@@ -6,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 import Link from 'next/link';
 import Image from 'next/image';
+import { TrashIcon } from '@heroicons/react/20/solid';
 
 const PropertyDetails = () => {
 	const params = useParams();
@@ -13,6 +15,9 @@ const PropertyDetails = () => {
 	const [property, setProperty] = useState([]);
 	const [review, setReview] = useState([]);
 	const [rating, setRating] = useState([]);
+	let currentUserId =
+		localStorage &&
+		JSON.parse(localStorage.getItem('user'))?.user_id;
 
 	const handleReviewInput = (r) => {
 		setReview(r);
@@ -34,13 +39,31 @@ const PropertyDetails = () => {
 				window.location.reload();
 			})
 			.catch((e) => {
-				if (e.response.data.error.includes("Duplicate")){
-					toast.error("Can't post multiple reviews for a property.");
-				} else if (e.response.data.error.includes("review_length")) {
-					toast.error("Review length cannot exceed 200 characters.")
+				if (e.response.data.error.includes('Duplicate')) {
+					toast.error(
+						"Can't post multiple reviews for a property."
+					);
+				} else if (
+					e.response.data.error.includes('review_length')
+				) {
+					toast.error(
+						'Review length cannot exceed 200 characters.'
+					);
 				} else {
-					toast.error("Can't add review.")
+					toast.error("Can't add review.");
 				}
+			});
+	};
+
+	const handleDelete = (userId, propertyId) => {
+		apiService
+			.deleteReview({
+				user_id: userId,
+				property_id: propertyId,
+			})
+			.then(() => {
+				toast.success('Review deleted successfully.');
+				window.location.reload();
 			});
 	};
 
@@ -51,6 +74,8 @@ const PropertyDetails = () => {
 				setProperty(propertyDetails);
 			});
 	}, []);
+
+	console.log('token', currentUserId);
 
 	const {
 		name,
@@ -166,9 +191,25 @@ const PropertyDetails = () => {
 											{review.rating}/5
 										</p>
 									</div>
-									<p className='px-4 py-1'>
-										{review.comment}
-									</p>
+									<div className='flex justify-between items-center px-2'>
+										<p className='px-2 py-1'>
+											{review.comment}
+										</p>
+										{review.user_id ===
+											currentUserId && (
+											<button
+												className='p-2'
+												onClick={() =>
+													handleDelete(
+														review.user_id,
+														id
+													)
+												}
+											>
+												<TrashIcon className='h-4 w-4 text-gray-500' />
+											</button>
+										)}
+									</div>
 									<p className='text-sm text-gray-500 px-4 py-2'>
 										{new Date(
 											review.created_at
