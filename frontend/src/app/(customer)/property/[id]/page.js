@@ -39,7 +39,7 @@ const PropertyDetails = () => {
 				} else if (e.response.data.error.includes("review_length")) {
 					toast.error("Review length cannot exceed 200 characters.")
 				} else {
-					toast.error(e.response.data.error)
+					toast.error("Can't add review.")
 				}
 			});
 	};
