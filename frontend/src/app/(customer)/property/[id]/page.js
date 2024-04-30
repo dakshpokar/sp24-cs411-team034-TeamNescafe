@@ -75,8 +75,6 @@ const PropertyDetails = () => {
 			});
 	}, []);
 
-	console.log('token', currentUserId);
-
 	const {
 		name,
 		address,
