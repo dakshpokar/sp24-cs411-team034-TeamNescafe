@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 import Link from 'next/link';
 import Image from 'next/image';
+import { TrashIcon } from '@heroicons/react/20/solid';
 
 const PropertyDetails = () => {
 	const params = useParams();
@@ -13,6 +14,7 @@ const PropertyDetails = () => {
 	const [property, setProperty] = useState([]);
 	const [review, setReview] = useState([]);
 	const [rating, setRating] = useState([]);
+	const currentUserId = localStorage.getItem('user')['user_id'];
 
 	const handleReviewInput = (r) => {
 		setReview(r);
@@ -154,26 +156,40 @@ const PropertyDetails = () => {
 								Reviews
 							</h3>
 							{reviews.map((review, index) => (
+								
 								<div
 									key={index}
 									className='w-full border-collapse rounded-lg border-b my-4 '
 								>
 									<div className='flex justify-between items-center px-2'>
 										<p className='font-semibold px-2'>
-											{review.user_name}
+											{review.user_id}
 										</p>
 										<p className='px-2'>
 											{review.rating}/5
 										</p>
 									</div>
-									<p className='px-4 py-1'>
-										{review.comment}
-									</p>
+									<div className='flex justify-between items-center px-2'>
+										<p className='px-2 py-1'>
+											{review.comment}
+										</p>
+										{
+											review.user_id === parseInt(currentUserId) && (
+												<button
+													className='p-2'
+													onClick={() => handleDelete(index)} // replace handleDelete with your delete function
+												>
+													<TrashIcon className='h-4 w-4 text-gray-500' />
+												</button>)
+										}
+										
+									</div>
 									<p className='text-sm text-gray-500 px-4 py-2'>
 										{new Date(
 											review.created_at
 										).toLocaleDateString()}
 									</p>
+									
 								</div>
 							))}
 							<textarea

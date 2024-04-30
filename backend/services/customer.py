@@ -182,7 +182,7 @@ def get_property_from_id():
                 query2 = (f"select * from propertyphoto where property_id = {property_id};")
                 rows2 = run_query(conn, query2)
 
-                query3 = f"SELECT u.first_name, u.last_name, r.created_at, r.comment, r.rating FROM reviews as r join user as u on r.user_id=u.user_id where r.property_id = {property_id};"
+                query3 = f"SELECT u.first_name, u.last_name, r.created_at, r.comment, r.rating, r.user_id FROM reviews as r join user as u on r.user_id=u.user_id where r.property_id = {property_id};"
                 rows3 = run_query(conn, query3)
 
                 query4 = f"SELECT unit_id, apartment_no from unit where property_id={property_id};"
@@ -197,7 +197,8 @@ def get_property_from_id():
                             'user_name': row[0] + ' ' + row[1],
                             'created_at': row[2],
                             'comment': row[3],
-                            'rating': row[4]
+                            'rating': row[4],
+                            'user_id': row[5]
                         })
                     avgRating /= len(reviews)
 
