@@ -114,7 +114,12 @@ def signout():
                 results = {'success': True, 'message':'Signed Out Successful'}
                 return jsonify(results)
             except Exception as e:
+                conn.close()
                 return jsonify({'error': str(e)}), 500
             
     except Exception as e:
+        conn.close()
         return jsonify({'error': str(e)}), 500
+    
+    finally:
+        conn.close()
