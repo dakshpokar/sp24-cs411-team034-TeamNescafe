@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from utils import *
 from db import connection, connect_to_database
 from datetime import datetime
-from zoneinfo import ZoneInfo
+
 
 customer_service = Blueprint('customer_service', __name__, url_prefix='/customer')
 
@@ -337,7 +337,7 @@ def add_review():
         property_id = data.get('property_id')
         comment = data.get('comment')
         rating = data.get('rating')
-        created_at = datetime.now(tz=ZoneInfo("America/Chicago")).strftime('%Y-%m-%d')
+        created_at = datetime.now().strftime('%Y-%m-%d')
         success = True
 
         conn = connect_to_database()
