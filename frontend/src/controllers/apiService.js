@@ -42,6 +42,7 @@ const post = async (endpoint, data, isAuthorised = false) => {
 const apiService = {
 	login: async (data) => post('auth/login', data),
 	signup: async (data) => post('auth/sign_up', data),
+	signout: async (data) => post('auth/signout', data),
 	submitApplication: async (data) =>
 		post('customer/submit_application', data, true),
 	listProperties: async (params) =>

@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from utils import *
 import hashlib
-from db import connection
+from db import connect_to_database, connection
 
 auth_service = Blueprint('auth_service', __name__, url_prefix='/auth')
 
@@ -99,16 +99,25 @@ def sign_up():
         print(e)
         return jsonify({'error': str(e)}), 500
 
-@auth_service.route('/sign_out', methods=['POST'])
-def sign_out():
+@auth_service.route('/signout', methods=['POST'])
+def signout():
     try:
-        data = request.json
-        token = data['token']
-        query = (f"delete from tokens where token = '{token}'")
-        if not run_update_query(connection, query):
-            return jsonify({'success': False, 'message': "Failed to sign out"}), 409
+        conn = connect_to_database()
+        if conn:
+            try:
+                data = request.json
+                token = data['token']
+                query = (f"delete from tokens where token = '{token}'")
+                if not run_update_query(conn, query):
+                    return jsonify({'success': False, 'message': "Failed to sign out"}), 409
 
-        results = {'success': True, 'message':'Signed Out Successful'}
-        return jsonify(results)
+                results = {'success': True, 'message':'Signed Out Successful'}
+                return jsonify(results)
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+            
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+    finally:
+        conn.close()
