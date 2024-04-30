@@ -122,9 +122,10 @@ const UnitDetails = () => {
 
 					<button
 						onClick={handleSubmitApplication}
-						className={`bg-orange-500 text-white rounded-lg px-4 py-2 mt-6 hover:bg-orange-600 ${
-							!availability &&
-							'cursor-not-allowed bg-orange-200 hover:bg-orange-200'
+						className={`text-white rounded-lg px-4 py-2 mt-6  ${
+							!availability
+								? 'cursor-not-allowed bg-orange-200'
+								: 'bg-orange-500 hover:bg-orange-600'
 						}`}
 						disabled={!availability}
 					>
