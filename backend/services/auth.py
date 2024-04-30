@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from utils import *
 import hashlib
-from db import connect_to_database, connection
+from db import connection, run_query, run_update_query
 
 auth_service = Blueprint('auth_service', __name__, url_prefix='/auth')
 
