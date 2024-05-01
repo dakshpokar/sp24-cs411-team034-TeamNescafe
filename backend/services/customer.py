@@ -10,6 +10,7 @@ customer_service = Blueprint('customer_service', __name__, url_prefix='/customer
 def min_max_rent():
     try:
         conn = connect_to_database()
+        conn.start_transaction('SERIALIZABLE')
         if conn:
             try:
                 query = (f"SELECT p.pincode, "
@@ -118,6 +119,7 @@ def list_properties():
         companyName = sanitize_input(data.get('companyName'))
 
         conn = connect_to_database()
+        conn.start_transaction('SERIALIZABLE')
         if conn:
             try:
                 query = ("select distinct p.property_id, p.name, c.name, p.address, p.pincode from property p JOIN company c ON p.company_id = c.company_id JOIN unit u ON u.property_id = p.property_id")
@@ -235,9 +237,10 @@ def get_property_from_id():
 def my_applications():
     try:
         token = request.headers['Authorization']
-        user_id = get_user_id(connection, token)
 
         conn = connect_to_database()
+        conn.start_transaction('SERIALIZABLE')
+        user_id = get_user_id(conn, token)
         if conn:
             try:
                 query = (f"SELECT u.apartment_no, p.name, u.price, a.status, u.unit_id, u.property_id "
@@ -301,7 +304,8 @@ def get_roommates():
         if conn:
             try:
                 query = (
-                    f"SELECT u.user_id,u.first_name,u.last_name,u.email_id,((SELECT COUNT(*) FROM userdetails ud WHERE ud.user_id = u.user_id AND "
+                    f"SELECT u.user_id,u.first_name,u.last_name,u.email_id,JSON_ARRAYAGG(JSON_OBJECT('pref_id', ud.pref_id,'value', ud.value)) AS prefs,"
+                    f"((SELECT COUNT(*) FROM userdetails ud WHERE ud.user_id = u.user_id AND "
                     f"ud.value IN (SELECT value FROM userdetails WHERE user_id = {user_id} AND ud.pref_id = pref_id)) / "
                     f"(SELECT COUNT(*) FROM userdetails WHERE user_id = {user_id})) AS similarity_score "
                     f"FROM user u JOIN userdetails ud ON u.user_id = ud.user_id WHERE u.user_id != {user_id} GROUP BY u.user_id "
@@ -314,9 +318,29 @@ def get_roommates():
                         'first_name': row[1],
                         'last_name': row[2],
                         'email_id': row[3],
-                        'similarity_ratio': row[4]
+                        'prefs': json.loads(row[4]),
+                        'similarity_ratio': row[5]
                     })
-                return jsonify(results)
+                query = (f"SELECT * from preferences")
+                rows = run_query(conn, query)
+                preferences = {}
+                for row in rows:
+                    preferences[row[0]] = row[1]
+
+                query = (f"SELECT pref_id, value from userdetails where user_id = {user_id}")
+                rows = run_query(conn, query)
+                current_user_preferences = []
+                for row in rows:
+                    current_user_preferences.append({
+                        'pref_id': row[0],
+                        'value': row[1]
+                    })
+               
+                return jsonify({
+                    'preferences': preferences,
+                    'roommates': results,
+                    'current_user_preferences': current_user_preferences
+                })
             finally:
                 conn.close()
         else:
