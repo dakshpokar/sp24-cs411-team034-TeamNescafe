@@ -80,8 +80,10 @@ const RoommatePrefsModal = ({
                               <tr
                                 key={index}
                                 className={
-                                  currentUserPrefMap[pref.pref_id]?.value ===
-                                  pref.value
+                                  currentUserPrefMap[
+                                    pref.pref_id
+                                  ]?.value?.toLowerCase() ===
+                                  pref.value?.toLowerCase()
                                     ? "bg-green-100"
                                     : "bg-red-100"
                                 }
