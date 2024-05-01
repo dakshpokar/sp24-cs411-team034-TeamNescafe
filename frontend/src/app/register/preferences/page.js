@@ -38,7 +38,7 @@ export default function Preferences() {
 			gamer,
 			gym,
 			cooking,
-			music
+			music,
 		};
 		e.preventDefault();
 		apiService
@@ -58,7 +58,7 @@ export default function Preferences() {
 		<div className='flex flex-col justify-center items-center h-screen'>
 			<div className='sm:mx-auto sm:w-full sm:max-w-sm'>
 				<h2 className='mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900'>
-					Add your Preferences:
+					Add your Details:
 				</h2>
 			</div>
 			<form
@@ -79,9 +79,13 @@ export default function Preferences() {
 						onChange={(e) => setDietary(e.target.value)}
 						className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
 					>
-						<option value=''>Select Dietary Preference</option>
+						<option value=''>
+							Select Dietary Preference
+						</option>
 						<option value='Vegetarian'>Vegetarian</option>
-						<option value='Non-vegetarian'>Non-Vegetarian</option>
+						<option value='Non-vegetarian'>
+							Non-Vegetarian
+						</option>
 						<option value='Vegan'>Vegan</option>
 					</select>
 				</div>
@@ -99,7 +103,9 @@ export default function Preferences() {
 						onChange={(e) => setSmoking(e.target.value)}
 						className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
 					>
-						<option value=''>Select Smoking Preference</option>
+						<option value=''>
+							Select Smoking Preference
+						</option>
 						<option value='Smoker'>Smoker</option>
 						<option value='Non-smoker'>Non-Smoker</option>
 					</select>
@@ -118,9 +124,13 @@ export default function Preferences() {
 						onChange={(e) => setDrinking(e.target.value)}
 						className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
 					>
-						<option value=''>Select Drinking Preference</option>
+						<option value=''>
+							Select Drinking Preference
+						</option>
 						<option value='Drinker'>Drinker</option>
-						<option value='Non-drinker'>Non-drinker</option>
+						<option value='Non-drinker'>
+							Non-drinker
+						</option>
 					</select>
 				</div>
 				<div>
@@ -139,8 +149,12 @@ export default function Preferences() {
 					>
 						<option value=''>Select Expected Rent</option>
 						<option value='Under $500'>Under $500</option>
-						<option value='$500 - $1000'>$500 - $1000</option>
-						<option value='$1001 - $1500'>$1001 - $1500</option>
+						<option value='$500 - $1000'>
+							$500 - $1000
+						</option>
+						<option value='$1001 - $1500'>
+							$1001 - $1500
+						</option>
 						<option value='Over $1500'>Over $1500</option>
 						<option value='No budget'>No budget</option>
 					</select>
@@ -156,10 +170,14 @@ export default function Preferences() {
 						id='employment'
 						name='employment'
 						value={employment}
-						onChange={(e) => setEmployment(e.target.value)}
+						onChange={(e) =>
+							setEmployment(e.target.value)
+						}
 						className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
 					>
-						<option value=''>Select Employment Preference</option>
+						<option value=''>
+							Select Employment Preference
+						</option>
 						<option value='Student'>Student</option>
 						<option value='Employed'>Employed</option>
 						<option value='Unemployed'>Unemployed</option>
@@ -195,12 +213,18 @@ export default function Preferences() {
 						id='cleanliness'
 						name='cleanliness'
 						value={cleanliness}
-						onChange={(e) => setCleanliness(e.target.value)}
+						onChange={(e) =>
+							setCleanliness(e.target.value)
+						}
 						className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
 					>
-						<option value=''>Select Cleanliness Preference</option>
+						<option value=''>
+							Select Cleanliness Preference
+						</option>
 						<option value='Messy'>Messy</option>
-						<option value='Somewhat clean'>Somewhat Clean</option>
+						<option value='Somewhat clean'>
+							Somewhat Clean
+						</option>
 						<option value='Very clean'>Very Clean</option>
 					</select>
 				</div>
@@ -218,8 +242,12 @@ export default function Preferences() {
 						onChange={(e) => setSleep(e.target.value)}
 						className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
 					>
-						<option value=''>Select Sleep Preference</option>
-						<option value='Early riser'>Early-Riser</option>
+						<option value=''>
+							Select Sleep Preference
+						</option>
+						<option value='Early riser'>
+							Early-Riser
+						</option>
 						<option value='Night owl'>Night-Owl</option>
 					</select>
 				</div>
@@ -237,7 +265,9 @@ export default function Preferences() {
 						onChange={(e) => setGuests(e.target.value)}
 						className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
 					>
-						<option value=''>Select Guests Preference</option>
+						<option value=''>
+							Select Guests Preference
+						</option>
 						<option value='Yes'>Yes</option>
 						<option value='No'>No</option>
 						<option value='Rarely'>Rarely</option>
@@ -257,7 +287,9 @@ export default function Preferences() {
 						onChange={(e) => setLgbtq(e.target.value)}
 						className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
 					>
-						<option value=''>Select LGBTQ+ Preference</option>
+						<option value=''>
+							Select LGBTQ+ Preference
+						</option>
 						<option value='Yes'>Yes</option>
 						<option value='No'>No</option>
 					</select>
@@ -276,7 +308,9 @@ export default function Preferences() {
 						onChange={(e) => setGamer(e.target.value)}
 						className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
 					>
-						<option value=''>Select Gamer Preference</option>
+						<option value=''>
+							Select Gamer Preference
+						</option>
 						<option value='Yes'>Yes</option>
 						<option value='No'>No</option>
 					</select>
@@ -295,7 +329,9 @@ export default function Preferences() {
 						onChange={(e) => setGym(e.target.value)}
 						className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
 					>
-						<option value=''>Select Gym Preference</option>
+						<option value=''>
+							Select Gym Preference
+						</option>
 						<option value='Yes'>Yes</option>
 						<option value='No'>No</option>
 					</select>
@@ -314,9 +350,15 @@ export default function Preferences() {
 						onChange={(e) => setCooking(e.target.value)}
 						className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
 					>
-						<option value=''>Select Cooking Preference</option>
-						<option value='Love cooking'>Love Cooking</option>
-						<option value='Hate cooking'>Hate Cooking</option>
+						<option value=''>
+							Select Cooking Preference
+						</option>
+						<option value='Love cooking'>
+							Love Cooking
+						</option>
+						<option value='Hate cooking'>
+							Hate Cooking
+						</option>
 					</select>
 				</div>
 				<div>
@@ -333,7 +375,9 @@ export default function Preferences() {
 						onChange={(e) => setMusic(e.target.value)}
 						className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
 					>
-						<option value=''>Select Music Preference</option>
+						<option value=''>
+							Select Music Preference
+						</option>
 						<option value='Rock'>Rock</option>
 						<option value='Pop'>Pop</option>
 						<option value='Indie'>Indie</option>
