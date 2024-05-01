@@ -37,15 +37,12 @@ const Roommates = () => {
         });
         setCurrentUserPrefMap(prefMap);
 
-        console.log(prefMap);
-
         setCurrentUserPreferences(roommatesData.current_user_preferences);
 
         setIsLoading(false);
       })
       .catch((error) => {
         setIsLoading(false);
-        console.log(error);
       });
   }, []);
 
@@ -102,7 +99,7 @@ const Roommates = () => {
                     </td>
                     <td className="border px-4 py-2">
                       <button
-                        className="p-2 bg-blue-500 text-white rounded-md"
+                        className="p-2 bg-orange-600 text-white rounded-md"
                         onClick={() => {
                           setIsOpen(true);
                           setSelectedRoommate(roommate);

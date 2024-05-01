@@ -79,7 +79,10 @@ const RoommatePrefsModal = ({
                             selectedRoommate.prefs.map((pref, index) => (
                               <tr
                                 className={
-                                  index % 2 === 0 ? "bg-gray-100" : "bg-white"
+                                  currentUserPrefMap[pref.pref_id]?.value ===
+                                  pref.value
+                                    ? "bg-green-100"
+                                    : "bg-red-100"
                                 }
                               >
                                 <td className="border px-4 py-2">
@@ -130,10 +133,20 @@ const RoommatePrefsModal = ({
                             ))}
                         </table>
                       </div>
-
+                      <div className="flex flex-col items-center border-t border-gray-200 rounded dark:border-gray-700 px-4 mt-4">
+                        <span className="mt-4 text-sm">
+                          Matched Preferences:{" "}
+                          {Math.round(
+                            selectedRoommate.similarity_ratio *
+                              currentUserPreferences.length
+                          )}{" "}
+                          / {currentUserPreferences.length}
+                        </span>
+                      </div>
                       <div className="flex flex-col items-center border-t border-gray-200 rounded dark:border-gray-700 px-4 mt-4">
                         <span className="mt-4 text-xl">
-                          Match: {selectedRoommate.similarity_ratio * 100}%
+                          Match:{" "}
+                          {Math.round(selectedRoommate.similarity_ratio * 100)}%
                         </span>
                       </div>
 
