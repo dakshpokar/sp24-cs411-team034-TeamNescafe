@@ -78,6 +78,7 @@ const RoommatePrefsModal = ({
                             selectedRoommate.prefs &&
                             selectedRoommate.prefs.map((pref, index) => (
                               <tr
+                                key={index}
                                 className={
                                   currentUserPrefMap[pref.pref_id]?.value ===
                                   pref.value
@@ -119,6 +120,7 @@ const RoommatePrefsModal = ({
                             currentUserPreferences.map &&
                             currentUserPreferences.map((pref, index) => (
                               <tr
+                                key={index}
                                 className={
                                   index % 2 === 0 ? "bg-gray-100" : "bg-white"
                                 }
