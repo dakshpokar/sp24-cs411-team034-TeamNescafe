@@ -81,7 +81,7 @@ export default function Preferences() {
 					>
 						<option value=''>Select Dietary Preference</option>
 						<option value='Vegetarian'>Vegetarian</option>
-						<option value='Non-Vegetarian'>Non-Vegetarian</option>
+						<option value='Non-vegetarian'>Non-Vegetarian</option>
 						<option value='Vegan'>Vegan</option>
 					</select>
 				</div>
@@ -101,7 +101,7 @@ export default function Preferences() {
 					>
 						<option value=''>Select Smoking Preference</option>
 						<option value='Smoker'>Smoker</option>
-						<option value='Non-Smoker'>Non-Smoker</option>
+						<option value='Non-smoker'>Non-Smoker</option>
 					</select>
 				</div>
 				<div>
@@ -120,7 +120,7 @@ export default function Preferences() {
 					>
 						<option value=''>Select Drinking Preference</option>
 						<option value='Drinker'>Drinker</option>
-						<option value='Non-Drinker'>Non-Drinker</option>
+						<option value='Non-drinker'>Non-drinker</option>
 					</select>
 				</div>
 				<div>
@@ -139,8 +139,8 @@ export default function Preferences() {
 					>
 						<option value=''>Select Expected Rent</option>
 						<option value='Under $500'>Under $500</option>
-						<option value='$500-$1000'>$500-$1000</option>
-						<option value='$1001-$1500'>$1001-1500</option>
+						<option value='$500 - $1000'>$500 - $1000</option>
+						<option value='$1001 - $1500'>$1001 - $1500</option>
 						<option value='Over $1500'>Over $1500</option>
 						<option value='No budget'>No budget</option>
 					</select>
@@ -200,8 +200,8 @@ export default function Preferences() {
 					>
 						<option value=''>Select Cleanliness Preference</option>
 						<option value='Messy'>Messy</option>
-						<option value='Somewhat Clean'>Somewhat Clean</option>
-						<option value='Very Clean'>Very Clean</option>
+						<option value='Somewhat clean'>Somewhat Clean</option>
+						<option value='Very clean'>Very Clean</option>
 					</select>
 				</div>
 				<div>
@@ -219,8 +219,8 @@ export default function Preferences() {
 						className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
 					>
 						<option value=''>Select Sleep Preference</option>
-						<option value='Early-Riser'>Early-Riser</option>
-						<option value='Night-Owl'>Night-Owl</option>
+						<option value='Early riser'>Early-Riser</option>
+						<option value='Night owl'>Night-Owl</option>
 					</select>
 				</div>
 				<div>
@@ -315,8 +315,8 @@ export default function Preferences() {
 						className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
 					>
 						<option value=''>Select Cooking Preference</option>
-						<option value='Yes'>Love Cooking</option>
-						<option value='No'>Hate Cooking</option>
+						<option value='Love cooking'>Love Cooking</option>
+						<option value='Hate cooking'>Hate Cooking</option>
 					</select>
 				</div>
 				<div>
