@@ -133,7 +133,16 @@ const RoommatePrefsModal = ({
                             ))}
                         </table>
                       </div>
-
+                      <div className="flex flex-col items-center border-t border-gray-200 rounded dark:border-gray-700 px-4 mt-4">
+                        <span className="mt-4 text-sm">
+                          Matched Preferences:{" "}
+                          {Math.round(
+                            selectedRoommate.similarity_ratio *
+                              currentUserPreferences.length
+                          )}{" "}
+                          / {currentUserPreferences.length}
+                        </span>
+                      </div>
                       <div className="flex flex-col items-center border-t border-gray-200 rounded dark:border-gray-700 px-4 mt-4">
                         <span className="mt-4 text-xl">
                           Match: {selectedRoommate.similarity_ratio * 100}%
