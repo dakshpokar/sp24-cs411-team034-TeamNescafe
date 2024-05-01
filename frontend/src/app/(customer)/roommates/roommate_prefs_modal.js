@@ -79,7 +79,10 @@ const RoommatePrefsModal = ({
                             selectedRoommate.prefs.map((pref, index) => (
                               <tr
                                 className={
-                                  index % 2 === 0 ? "bg-gray-100" : "bg-white"
+                                  currentUserPrefMap[pref.pref_id]?.value ===
+                                  pref.value
+                                    ? "bg-green-100"
+                                    : "bg-red-100"
                                 }
                               >
                                 <td className="border px-4 py-2">
