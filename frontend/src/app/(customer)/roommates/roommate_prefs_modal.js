@@ -7,6 +7,7 @@ const RoommatePrefsModal = ({
   setIsOpen,
   selectedRoommate,
   currentUserPreferences,
+  currentUserPrefMap,
 }) => {
   return (
     <div>
@@ -70,6 +71,7 @@ const RoommatePrefsModal = ({
                             <tr>
                               <th className="px-4 py-2">Preference</th>
                               <th className="px-4 py-2">Value</th>
+                              <th className="px-4 py-2">Your Value</th>
                             </tr>
                           </thead>
                           {selectedRoommate &&
@@ -85,6 +87,11 @@ const RoommatePrefsModal = ({
                                 </td>
                                 <td className="border px-4 py-2">
                                   {pref.value}
+                                </td>
+                                <td className="border px-4 py-2">
+                                  {(currentUserPrefMap &&
+                                    currentUserPrefMap[pref.pref_id]?.value) ||
+                                    "-"}
                                 </td>
                               </tr>
                             ))}
@@ -106,6 +113,7 @@ const RoommatePrefsModal = ({
                           </thead>
                           {currentUserPreferences &&
                             currentUserPreferences &&
+                            currentUserPreferences.map &&
                             currentUserPreferences.map((pref, index) => (
                               <tr
                                 className={

@@ -12,7 +12,8 @@ const Roommates = () => {
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [currentUserPreferences, setCurrentUserPreferences] = useState([]);
+  const [currentUserPreferences, setCurrentUserPreferences] = useState({});
+  const [currentUserPrefMap, setCurrentUserPrefMap] = useState({});
 
   useEffect(() => {
     setIsLoading(true);
@@ -28,11 +29,18 @@ const Roommates = () => {
             return pref;
           });
         });
+        const prefMap = {};
         roommatesData.current_user_preferences.map((pref) => {
           pref.pref_name = roommatesData.preferences[pref.pref_id];
+          prefMap[pref.pref_id] = pref;
           return pref;
         });
+        setCurrentUserPrefMap(prefMap);
+
+        console.log(prefMap);
+
         setCurrentUserPreferences(roommatesData.current_user_preferences);
+
         setIsLoading(false);
       })
       .catch((error) => {
@@ -115,6 +123,7 @@ const Roommates = () => {
         setIsOpen={setIsOpen}
         selectedRoommate={selectedRoommate}
         currentUserPreferences={currentUserPreferences}
+        currentUserPrefMap={currentUserPrefMap}
       />
     </main>
   );
