@@ -10,6 +10,7 @@ customer_service = Blueprint('customer_service', __name__, url_prefix='/customer
 def min_max_rent():
     try:
         conn = connect_to_database()
+        conn.start_transaction('SERIALIZABLE')
         if conn:
             try:
                 query = (f"SELECT p.pincode, "
@@ -118,6 +119,7 @@ def list_properties():
         companyName = sanitize_input(data.get('companyName'))
 
         conn = connect_to_database()
+        conn.start_transaction('SERIALIZABLE')
         if conn:
             try:
                 query = ("select distinct p.property_id, p.name, c.name, p.address, p.pincode from property p JOIN company c ON p.company_id = c.company_id JOIN unit u ON u.property_id = p.property_id")
@@ -235,9 +237,10 @@ def get_property_from_id():
 def my_applications():
     try:
         token = request.headers['Authorization']
-        user_id = get_user_id(connection, token)
 
         conn = connect_to_database()
+        conn.start_transaction('SERIALIZABLE')
+        user_id = get_user_id(conn, token)
         if conn:
             try:
                 query = (f"SELECT u.apartment_no, p.name, u.price, a.status, u.unit_id, u.property_id "
