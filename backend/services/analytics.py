@@ -111,6 +111,8 @@ def apps_per_user():
             return jsonify({'error': "User is not an Agent"}), 403
 
         conn = connect_to_database()
+        conn.start_transaction('SERIALIZABLE')
+
         if conn:
             try:
                 query = (f"select company_id from agentcompanyrelationship where user_id={user_id}")

@@ -59,6 +59,8 @@ def submit_application():
         success = True
 
         conn = connect_to_database()
+        conn.start_transaction('SERIALIZABLE')
+        
         if conn:
             try:
                 query = (f"INSERT INTO applications (unit_id, user_id, created_at, status) "
