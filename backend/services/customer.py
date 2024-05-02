@@ -59,6 +59,8 @@ def submit_application():
         success = True
 
         conn = connect_to_database()
+        conn.start_transaction('SERIALIZABLE')
+        
         if conn:
             try:
                 query = (f"INSERT INTO applications (unit_id, user_id, created_at, status) "
@@ -306,7 +308,7 @@ def get_roommates():
                 query = (
                     f"SELECT u.user_id,u.first_name,u.last_name,u.email_id,JSON_ARRAYAGG(JSON_OBJECT('pref_id', ud.pref_id,'value', ud.value)) AS prefs,"
                     f"((SELECT COUNT(*) FROM userdetails ud WHERE ud.user_id = u.user_id AND "
-                    f"ud.value IN (SELECT value FROM userdetails WHERE user_id = {user_id} AND ud.pref_id = pref_id)) / "
+                    f"LOWER(ud.value) IN (SELECT LOWER(value) FROM userdetails WHERE user_id = {user_id} AND ud.pref_id = pref_id)) / "
                     f"(SELECT COUNT(*) FROM userdetails WHERE user_id = {user_id})) AS similarity_score "
                     f"FROM user u JOIN userdetails ud ON u.user_id = ud.user_id WHERE u.user_id != {user_id} GROUP BY u.user_id "
                     f"ORDER BY similarity_score DESC;")
